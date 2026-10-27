@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-27T15:00:00.000Z",
+  "updatedAt": "2026-10-27T15:37:05.570Z",
   "products": [
     {
       "id": "egg",
@@ -8,13 +8,19 @@
       "name": "Egg",
       "note": "Ferske egg fra gården",
       "unit": "stk",
-      "qty": 0,
+      "qty": 12,
       "active": true,
       "prices": [
-        { "label": "per egg", "amount": null },
-        { "label": "per brett (12 stk)", "amount": null }
+        {
+          "label": "per egg",
+          "amount": null
+        },
+        {
+          "label": "per brett (12 stk)",
+          "amount": null
+        }
       ],
-      "updatedAt": "2026-10-27T15:00:00.000Z"
+      "updatedAt": "2026-10-27T15:37:05.570Z"
     },
     {
       "id": "saft",
@@ -24,7 +30,12 @@
       "unit": "flasker",
       "qty": 0,
       "active": false,
-      "prices": [{ "label": "per flaske", "amount": null }],
+      "prices": [
+        {
+          "label": "per flaske",
+          "amount": null
+        }
+      ],
       "updatedAt": "2026-10-27T15:00:00.000Z"
     },
     {
@@ -35,7 +46,12 @@
       "unit": "sekker",
       "qty": 0,
       "active": false,
-      "prices": [{ "label": "per sekk", "amount": null }],
+      "prices": [
+        {
+          "label": "per sekk",
+          "amount": null
+        }
+      ],
       "updatedAt": "2026-10-27T15:00:00.000Z"
     },
     {
@@ -46,7 +62,12 @@
       "unit": "poser",
       "qty": 0,
       "active": false,
-      "prices": [{ "label": "per pose", "amount": null }],
+      "prices": [
+        {
+          "label": "per pose",
+          "amount": null
+        }
+      ],
       "updatedAt": "2026-10-27T15:00:00.000Z"
     }
   ]
