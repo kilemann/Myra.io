@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-27T15:38:20.065Z",
+  "updatedAt": "2026-10-27T15:41:05.113Z",
   "products": [
     {
       "id": "egg",
@@ -8,7 +8,7 @@
       "name": "Egg",
       "note": "Ferske egg fra gården",
       "unit": "stk",
-      "qty": 12,
+      "qty": 36,
       "active": true,
       "prices": [
         {
@@ -20,7 +20,7 @@
           "amount": 60
         }
       ],
-      "updatedAt": "2026-10-27T15:38:20.065Z"
+      "updatedAt": "2026-10-27T15:41:05.113Z"
     },
     {
       "id": "saft",
