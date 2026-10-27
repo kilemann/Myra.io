@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Oppdater lager – Myra</title>
+  <meta name="theme-color" content="#2F5D3A">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/icon-180.png">
+  <meta name="apple-mobile-web-app-title" content="Myra lager">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&amp;family=Figtree:wght@400;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="wrap wrap--narrow">
+
+    <!-- Første gang på denne telefonen -->
+    <form class="login" id="setup" hidden novalidate>
+      <h1>Sett opp telefonen</h1>
+      <p>Gjøres én gang. GitHub-nøkkelen lagres kryptert med passordet ditt, bare på denne enheten.</p>
+      <div class="field">
+        <label for="setup-username">Brukernavn</label>
+        <input class="input" id="setup-username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false">
+      </div>
+      <div class="field">
+        <label for="setup-token">GitHub-nøkkel</label>
+        <input class="input" id="setup-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
+      </div>
+      <div class="field">
+        <label for="setup-password">Velg passord</label>
+        <input class="input" id="setup-password" type="password" autocomplete="new-password">
+      </div>
+      <div class="field">
+        <label for="setup-password2">Gjenta passord</label>
+        <input class="input" id="setup-password2" type="password" autocomplete="new-password">
+      </div>
+      <p class="error" id="setup-error" role="alert" hidden></p>
+      <button class="btn" type="submit" id="setup-btn">Lagre og logg inn</button>
+      <a class="center-link" href="index.html">Tilbake til kundesiden</a>
+    </form>
+
+    <!-- Vanlig innlogging -->
+    <form class="login" id="login" hidden novalidate>
+      <h1>Logg inn</h1>
+      <p>for å oppdatere lager og priser</p>
+      <div class="field">
+        <label for="username">Brukernavn</label>
+        <input class="input" id="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false">
+      </div>
+      <div class="field">
+        <label for="password">Passord</label>
+        <input class="input" id="password" type="password" autocomplete="current-password">
+      </div>
+      <p class="error" id="login-error" role="alert" hidden></p>
+      <button class="btn" type="submit" id="login-btn">Logg inn</button>
+      <a class="center-link" href="index.html">Tilbake til kundesiden</a>
+      <button class="btn btn--link" type="button" id="login-forget">Bytt GitHub-nøkkel</button>
+    </form>
+
+    <!-- Oppdatering -->
+    <section id="admin" hidden>
+      <div class="admin-top">
+        <h1>Oppdater lager</h1>
+        <a class="btn btn--ghost" href="index.html">Se kundesiden</a>
+      </div>
+      <p class="hint">Gjør endringene, og trykk <strong>Publiser</strong> når du er ferdig. Kundesiden oppdateres i løpet av noen minutter.</p>
+      <p class="banner banner--error" id="admin-error" role="alert" hidden></p>
+      <div id="admin-list" class="admin-list"></div>
+      <div class="demo-tools">
+        <button class="btn btn--link" type="button" id="lock">Logg ut</button>
+        <button class="btn btn--link" type="button" id="forget">Glem denne enheten</button>
+      </div>
+      <p class="version" id="version"></p>
+    </section>
+  </main>
+
+  <div class="publishbar" id="publishbar" hidden>
+    <p class="publishbar__status" id="pending" role="status" aria-live="polite">Ingen endringer</p>
+    <div class="publishbar__actions">
+      <button class="btn btn--ghost" type="button" id="discard" disabled>Forkast</button>
+      <button class="btn" type="button" id="publish" disabled>Publiser</button>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/vault.js"></script>
+  <script src="js/github.js"></script>
+  <script src="js/dom.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Myra gårdsutsalg</title>
+  <meta name="description" content="Se hva Myra gårdsutsalg har til salgs akkurat nå – egg og andre gårdsprodukter.">
+  <meta name="theme-color" content="#F6F3EC">
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/icon-180.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&amp;family=Figtree:wght@400;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="wrap">
+    <header class="brand">
+      <svg viewBox="0 0 44 54" aria-hidden="true"><path d="M22 2C11 2 2 20 2 33a20 20 0 0 0 40 0C42 20 33 2 22 2z" fill="#F2B632"/></svg>
+      <div>
+        <p class="kicker" id="shop-kicker">Gårdsutsalg</p>
+        <h1 id="shop-name">Myra</h1>
+      </div>
+    </header>
+
+    <p class="banner banner--error" id="error-banner" role="alert" hidden></p>
+
+    <section aria-labelledby="products-heading">
+      <h2 id="products-heading" class="visually-hidden">Til salgs nå</h2>
+      <div class="grid" id="products" aria-live="polite" aria-busy="true"></div>
+    </section>
+
+    <section class="info" aria-labelledby="info-heading">
+      <h2 id="info-heading">Slik handler du</h2>
+      <dl>
+        <div><dt>Betaling</dt><dd id="info-payment"></dd></div>
+        <div><dt>Hvor</dt><dd id="info-address"></dd></div>
+        <div><dt>Når</dt><dd id="info-hours"></dd></div>
+      </dl>
+    </section>
+
+    <footer class="footer">
+      <a href="admin.html">Selger? Oppdater lager</a>
+      <span id="version"></span>
+    </footer>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/dom.js"></script>
+  <script src="js/public.js"></script>
+</body>
+</html>
