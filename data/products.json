@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-27T15:37:05.570Z",
+  "updatedAt": "2026-10-27T15:38:20.065Z",
   "products": [
     {
       "id": "egg",
@@ -13,14 +13,14 @@
       "prices": [
         {
           "label": "per egg",
-          "amount": null
+          "amount": 6
         },
         {
           "label": "per brett (12 stk)",
-          "amount": null
+          "amount": 60
         }
       ],
-      "updatedAt": "2026-10-27T15:37:05.570Z"
+      "updatedAt": "2026-10-27T15:38:20.065Z"
     },
     {
       "id": "saft",
