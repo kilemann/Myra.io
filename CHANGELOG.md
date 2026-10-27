@@ -1,5 +1,10 @@
 # Versjonslogg
 
+## v1.2 – 2026-10-27
+- Ny logo (variant A: kurv med saft, egg og gulrot i grønn sirkel) i toppen av kundesiden – `img/logo.svg`.
+- Logoen brukes som fane-ikon, og som `img/logo-180.png` når kundesiden legges på hjemskjermen.
+- Admin-appen beholder det gamle ikonet inntil videre.
+
 ## v1.1.1 – 2026-10-27
 - Fjernet lenken «Selger? Oppdater lager» fra kundesiden. Admin-siden nås direkte på `admin.html` (eller fra hjemskjermen).
 - Ende-til-ende-testen bruker nå fast testdata (`tests/fixtures/products.json`) i stedet for den ekte lagerfila.

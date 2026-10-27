@@ -203,3 +203,9 @@ button { cursor: pointer; }
 
 /* ---------- v1.1.1 ---------- */
 .footer--end { justify-content: flex-end; }
+
+/* ---------- v1.2: logo ---------- */
+.brand__logo { flex: none; width: 72px; height: 72px; display: block; }
+@media (min-width: 720px) {
+  .brand__logo { width: 96px; height: 96px; }
+}

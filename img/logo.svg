@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Myra gårdsutsalg">
+  <circle cx="60" cy="60" r="60" fill="#2F5D3A"/>
+  <path d="M32 60 C32 24, 88 24, 88 60" fill="none" stroke="#E9D3A8" stroke-width="5" stroke-linecap="round"/>
+  <rect x="35" y="30" width="17" height="34" rx="5" fill="#C2413A"/>
+  <rect x="39.5" y="22" width="8" height="10" rx="2" fill="#C2413A"/>
+  <rect x="38.5" y="19" width="10" height="4" rx="1.5" fill="#F6F3EC"/>
+  <ellipse cx="64" cy="49" rx="11" ry="14" fill="#FFF8EA"/>
+  <path d="M78 58 L96 34 Q99 31 96 29 Q94 27 91 30 L74 52 Z" fill="#E8812F"/>
+  <path d="M94 30 Q97 21 102 20 M95 31 Q103 27 106 29" fill="none" stroke="#8CC084" stroke-width="3" stroke-linecap="round"/>
+  <path d="M24 64 L96 64 L88 94 Q87 98 83 98 L37 98 Q33 98 32 94 Z" fill="#C8893F"/>
+  <path d="M28 76 L92 76 M30.5 86 L89.5 86" stroke="#8E5A2B" stroke-width="2.5" stroke-linecap="round"/>
+  <rect x="20" y="58" width="80" height="9" rx="4.5" fill="#8E5A2B"/>
+</svg>

@@ -96,6 +96,21 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 390);
     });
 
+    await t.test('kundesiden viser Myra-logoen i toppen og som fane-ikon', async () => {
+      const logo = page.locator('header.brand img.brand__logo');
+      assert.equal(await logo.count(), 1);
+      assert.equal(await logo.getAttribute('src'), 'img/logo.svg');
+      assert.match(await logo.getAttribute('alt'), /Myra/);
+      const loaded = await logo.evaluate(img => img.complete && img.naturalWidth > 0);
+      assert.ok(loaded, 'logo.svg skal laste');
+      const box = await logo.boundingBox();
+      assert.ok(box.width >= 56 && box.width <= 100, 'fornuftig størrelse på mobil: ' + box.width);
+      assert.equal(await page.getAttribute('link[rel="icon"]', 'href'), 'img/logo.svg');
+      assert.equal(await page.getAttribute('link[rel="apple-touch-icon"]', 'href'), 'img/logo-180.png');
+      const res = await page.request.get(base + 'img/logo-180.png');
+      assert.equal(res.status(), 200);
+    });
+
     await t.test('kundesiden har ingen lenke til admin-siden', async () => {
       assert.equal(await page.locator('a[href*="admin"]').count(), 0);
       assert.doesNotMatch(await page.locator('body').innerText(), /Oppdater lager/i);
