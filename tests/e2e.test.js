@@ -63,7 +63,9 @@ function fakeGitHub(initial) {
   return state;
 }
 
-const seed = () => JSON.parse(fs.readFileSync(path.join(ROOT, 'data/products.json'), 'utf8'));
+// Fast testdata – uavhengig av hva som faktisk ligger i data/products.json
+const FIXTURE = path.join(__dirname, 'fixtures/products.json');
+const seed = () => JSON.parse(fs.readFileSync(FIXTURE, 'utf8'));
 
 test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installert' }, async t => {
   const srv = await serve();
@@ -73,6 +75,7 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
   await ctx.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
   const gh = fakeGitHub(seed());
   await ctx.route(API + '**', gh.handler);
+  await ctx.route(/^http:\/\/localhost:\d+\/data\/products\.json/, r => r.fulfill({ status: 200, contentType: 'application/json', body: fs.readFileSync(FIXTURE, 'utf8') }));
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
@@ -91,6 +94,11 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       const order = await page.locator('.card .card__title').allInnerTexts();
       assert.deepEqual(order, ['Egg', 'Saft', 'Ved', 'Grønnsaker']);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 390);
+    });
+
+    await t.test('kundesiden har ingen lenke til admin-siden', async () => {
+      assert.equal(await page.locator('a[href*="admin"]').count(), 0);
+      assert.doesNotMatch(await page.locator('body').innerText(), /Oppdater lager/i);
     });
 
     await t.test('første gang: oppsett lagrer nøkkelen kryptert', async () => {

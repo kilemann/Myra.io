@@ -1,5 +1,9 @@
 # Versjonslogg
 
+## v1.1.1 – 2026-10-27
+- Fjernet lenken «Selger? Oppdater lager» fra kundesiden. Admin-siden nås direkte på `admin.html` (eller fra hjemskjermen).
+- Ende-til-ende-testen bruker nå fast testdata (`tests/fixtures/products.json`) i stedet for den ekte lagerfila.
+
 ## v1.1 – 2026-10-27
 - Lagring via GitHub i stedet for Supabase: admin-siden skriver `data/products.json` til `main` med GitHubs Contents API, og GitHub Pages publiserer.
 - **Publiser**-knapp i stedet for autolagring. Det blir én commit per publisering, endrede varer markeres, og **Forkast** angrer.

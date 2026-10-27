@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "updatedAt": "2026-10-27T15:00:00.000Z",
+  "products": [
+    {
+      "id": "egg",
+      "sort": 10,
+      "name": "Egg",
+      "note": "Ferske egg fra gården",
+      "unit": "stk",
+      "qty": 0,
+      "active": true,
+      "prices": [
+        { "label": "per egg", "amount": null },
+        { "label": "per brett (12 stk)", "amount": null }
+      ],
+      "updatedAt": "2026-10-27T15:00:00.000Z"
+    },
+    {
+      "id": "saft",
+      "sort": 20,
+      "name": "Saft",
+      "note": "Hjemmelaget",
+      "unit": "flasker",
+      "qty": 0,
+      "active": false,
+      "prices": [{ "label": "per flaske", "amount": null }],
+      "updatedAt": "2026-10-27T15:00:00.000Z"
+    },
+    {
+      "id": "ved",
+      "sort": 30,
+      "name": "Ved",
+      "note": "Til peis og vedovn",
+      "unit": "sekker",
+      "qty": 0,
+      "active": false,
+      "prices": [{ "label": "per sekk", "amount": null }],
+      "updatedAt": "2026-10-27T15:00:00.000Z"
+    },
+    {
+      "id": "veg",
+      "sort": 40,
+      "name": "Grønnsaker",
+      "note": "Etter sesong",
+      "unit": "poser",
+      "qty": 0,
+      "active": false,
+      "prices": [{ "label": "per pose", "amount": null }],
+      "updatedAt": "2026-10-27T15:00:00.000Z"
+    }
+  ]
+}

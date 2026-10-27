@@ -200,3 +200,6 @@ button { cursor: pointer; }
 .publishbar__status--dirty { color: var(--low-fg); font-weight: 700; }
 .publishbar__actions { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; max-width: 488px; width: 100%; margin: 0 auto; }
 .publishbar .btn { min-height: 52px; }
+
+/* ---------- v1.1.1 ---------- */
+.footer--end { justify-content: flex-end; }
