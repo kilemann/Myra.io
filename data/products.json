@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-10-30T18:24:15.819Z",
+  "updatedAt": "2026-10-30T19:29:58.952Z",
   "categories": [
     {
       "id": "egg",
@@ -40,14 +40,14 @@
           "id": "smaegg",
           "name": "Små egg",
           "unit": "stk",
-          "qty": 12,
+          "qty": 6,
           "prices": [
             {
               "label": "per egg",
               "amount": 6
             }
           ],
-          "updatedAt": "2026-10-30T18:24:15.819Z"
+          "updatedAt": "2026-10-30T19:29:58.952Z"
         }
       ]
     },
