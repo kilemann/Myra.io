@@ -70,13 +70,29 @@ Hvis noen andre har publisert i mellomtiden, henter siden den nyeste versjonen o
 - GitHub Pages har en myk grense på 10 bygg i timen når siden publiseres fra en branch. Publiser-knappen gjør at det blir få bygg.
 - Dette er en testløsning. For sanntidsoppdatering kan datalaget senere byttes til en database (for eksempel Supabase) uten å endre dataformatet.
 
-## Legge til en ny vare
+## Kategorier og varer
 
-Rediger `data/products.json` på GitHub og legg til et nytt objekt med unik `id` og `sort` (rekkefølgen). Kopier gjerne en eksisterende vare:
+| Kategori | Varer | Pris |
+|---|---|---|
+| Egg | Egg, Små egg | per egg / per brett (12 stk) – små egg: per egg |
+| Saft | Saft | per flaske |
+| Honning | Honning | per boks |
+| Syltetøy | 4 typer, navn settes i admin | per glass |
+| Bær, frukt og grønnsaker | 8 typer, navn settes i admin | per hg (antall i hg) |
+| Ved | Ved | per sekk |
+
+- **Synlig/Skjult** gjelder hele kategorien. Skjult = «Kommer senere» på kundesiden.
+- En vare uten navn vises ikke for kundene. Tøm navnet for å fjerne en type.
+
+### Legge til en ny kategori
+
+Rediger `data/products.json` på GitHub og legg til en kategori med unik `id` og `sort` (rekkefølgen), for eksempel:
 
 ```json
-{ "id": "honning", "sort": 50, "name": "Honning", "note": "Lokal", "unit": "glass",
-  "qty": 0, "active": false, "prices": [{ "label": "per glass", "amount": null }], "updatedAt": null }
+{ "id": "poteter", "sort": 55, "name": "Poteter", "note": "", "active": false, "namedItems": false,
+  "steps": [-5, -1, 1, 5], "updatedAt": null,
+  "items": [{ "id": "poteter", "name": "Poteter", "unit": "kg", "qty": 0,
+              "prices": [{ "label": "per kg", "amount": null }], "updatedAt": null }] }
 ```
 
 ## Utvikling og tester

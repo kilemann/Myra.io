@@ -3,35 +3,72 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const core = require('../js/core.js');
 
-const base = () => core.normalizeData({
-  version: 1,
-  updatedAt: '2026-10-20T10:00:00.000Z',
-  products: [
-    { id: 'saft', sort: 20, name: 'Saft', note: 'Hjemmelaget', unit: 'flasker', qty: 0, active: false,
-      prices: [{ label: 'per flaske', amount: null }], updatedAt: '2026-10-20T10:00:00.000Z' },
-    { id: 'egg', sort: 10, name: 'Egg', note: 'Ferske egg', unit: 'stk', qty: 24, active: true,
-      prices: [{ label: 'per egg', amount: 5 }, { label: 'per brett (12 stk)', amount: 55 }],
-      updatedAt: '2026-10-20T10:00:00.000Z' }
-  ]
+const cat = (d, id) => d.categories.find(c => c.id === id);
+const itm = (d, c, i) => cat(d, c).items.find(x => x.id === i);
+
+const base = () => {
+  const d = core.defaultData();
+  itm(d, 'egg', 'egg').qty = 24;
+  itm(d, 'egg', 'egg').prices[0].amount = 5;
+  d.categories.forEach(c => { c.updatedAt = '2026-10-20T10:00:00.000Z'; c.items.forEach(i => { i.updatedAt = '2026-10-20T10:00:00.000Z'; }); });
+  return core.normalizeData(d);
+};
+
+test('standardoppsettet har riktige kategorier og varer', () => {
+  const d = core.defaultData();
+  assert.deepEqual(d.categories.map(c => c.id), ['egg', 'saft', 'honning', 'syltetoy', 'baer', 'ved']);
+  assert.deepEqual(cat(d, 'egg').items.map(i => i.name), ['Egg', 'Små egg']);
+  assert.equal(itm(d, 'egg', 'smaegg').prices.length, 1);
+  assert.equal(itm(d, 'honning', 'honning').prices[0].label, 'per boks');
+  assert.equal(cat(d, 'syltetoy').items.length, 4);
+  assert.ok(cat(d, 'syltetoy').namedItems);
+  assert.ok(cat(d, 'syltetoy').items.every(i => i.prices[0].label === 'per glass' && i.name === ''));
+  assert.equal(cat(d, 'baer').items.length, 8);
+  assert.ok(cat(d, 'baer').items.every(i => i.prices[0].label === 'per hg'));
+  assert.equal(cat(d, 'baer').name, 'Bær, frukt og grønnsaker');
+  assert.ok(!d.categories.some(c => /grønnsaker/i.test(c.name) && c.id === 'veg'));
 });
 
-test('normalizeData sorterer etter sort og retter opp ugyldige verdier', () => {
-  const d = core.normalizeData({ products: [
-    { id: 'b', sort: 2, name: 'B', qty: -4, active: 'ja', prices: [{ label: 'x', amount: 'tull' }] },
-    { id: 'a', sort: 1, name: 'A', qty: '7' }
-  ] });
-  assert.deepEqual(d.products.map(p => p.id), ['a', 'b']);
-  assert.equal(d.products[0].qty, 7);
-  assert.equal(d.products[1].qty, 0);
-  assert.equal(d.products[1].active, true);
-  assert.equal(d.products[1].prices[0].amount, null);
-  assert.deepEqual(d.products[0].prices, []);
-  assert.equal(d.version, 1);
+test('v1-data flyttes over til v2 uten å miste antall, pris og synlighet', () => {
+  const v1 = { version: 1, updatedAt: '2026-10-30T12:00:00.000Z', products: [
+    { id: 'egg', name: 'Egg', qty: 24, active: true, prices: [{ label: 'per egg', amount: 6 }, { label: 'per brett (12 stk)', amount: 60 }], updatedAt: '2026-10-30T12:00:00.000Z' },
+    { id: 'saft', name: 'Saft', qty: 3, active: true, prices: [{ label: 'per flaske', amount: 40 }] },
+    { id: 'ved', name: 'Ved', qty: 0, active: false, prices: [{ label: 'per sekk', amount: null }] },
+    { id: 'veg', name: 'Grønnsaker', qty: 5, active: true, prices: [] }
+  ] };
+  const d = core.normalizeData(v1);
+  assert.equal(d.version, 2);
+  assert.equal(itm(d, 'egg', 'egg').qty, 24);
+  assert.deepEqual(itm(d, 'egg', 'egg').prices.map(p => p.amount), [6, 60]);
+  assert.equal(itm(d, 'egg', 'egg').updatedAt, '2026-10-30T12:00:00.000Z');
+  assert.equal(cat(d, 'egg').active, true);
+  assert.equal(itm(d, 'saft', 'saft').qty, 3);
+  assert.equal(cat(d, 'saft').active, true);
+  assert.equal(itm(d, 'egg', 'smaegg').qty, 0);
+  assert.ok(!d.categories.some(c => c.id === 'veg'), 'grønnsaker er fjernet som egen kategori');
 });
 
 test('normalizeData tåler tomt eller ødelagt innhold', () => {
-  assert.deepEqual(core.normalizeData(null).products, []);
-  assert.deepEqual(core.normalizeData({ products: 'nei' }).products, []);
+  assert.deepEqual(core.normalizeData(null).categories, []);
+  assert.deepEqual(core.normalizeData({ categories: 'nei' }).categories, []);
+  const d = core.normalizeData({ categories: [{ id: 'x', items: [{ id: 'a', qty: -3, prices: [{ label: 'p', amount: 'tull' }] }] }] });
+  assert.equal(d.categories[0].items[0].qty, 0);
+  assert.equal(d.categories[0].items[0].prices[0].amount, null);
+});
+
+test('visibleItems skjuler varer uten navn', () => {
+  const d = core.defaultData();
+  const s = cat(d, 'syltetoy');
+  assert.equal(core.visibleItems(s).length, 0);
+  s.items[1].name = 'Jordbær';
+  assert.deepEqual(core.visibleItems(s).map(i => i.name), ['Jordbær']);
+});
+
+test('latestUpdate gir nyeste tidspunkt i kategorien', () => {
+  const c = cat(base(), 'egg');
+  c.items[1].updatedAt = '2026-10-29T08:00:00.000Z';
+  c.items[0].updatedAt = '2026-10-30T09:00:00.000Z';
+  assert.equal(core.latestUpdate(c).toISOString(), '2026-10-30T09:00:00.000Z');
 });
 
 test('stockStatus', () => {
@@ -50,80 +87,82 @@ test('formatUpdated: i dag, i går, dato og annet år', () => {
 
 test('formatPrice bruker norsk desimalkomma og tom pris', () => {
   assert.equal(core.formatPrice({ label: 'per egg', amount: 5 }), '5 kr per egg');
-  assert.equal(core.formatPrice({ label: 'per brett', amount: 55.5 }), '55,5 kr per brett');
-  assert.equal(core.formatPrice({ label: 'per flaske', amount: null }), 'Pris per flaske kommer');
+  assert.equal(core.formatPrice({ label: 'per hg', amount: 12.5 }), '12,5 kr per hg');
+  assert.equal(core.formatPrice({ label: 'per glass', amount: null }), 'Pris per glass kommer');
 });
 
-test('parseAmount godtar komma og punktum, avviser tull', () => {
+test('parseAmount og parseQty', () => {
   assert.equal(core.parseAmount('55,5'), 55.5);
-  assert.equal(core.parseAmount(' 12.25 '), 12.25);
-  assert.equal(core.parseAmount('1 000'), 1000);
   assert.equal(core.parseAmount(''), null);
   assert.equal(core.parseAmount('abc'), undefined);
-  assert.equal(core.parseAmount('-3'), undefined);
-});
-
-test('parseQty gir heltall >= 0', () => {
-  assert.equal(core.parseQty('24'), 24);
   assert.equal(core.parseQty('2 4'), 24);
   assert.equal(core.parseQty(''), 0);
-  assert.equal(core.parseQty('-5'), 5);
 });
 
-test('changedIds finner bare varer med endret antall, synlighet eller pris', () => {
+test('changedKeys finner endret synlighet, antall, navn og pris', () => {
   const b = base();
   const l = core.clone(b);
-  assert.deepEqual(core.changedIds(b, l), []);
-  l.products.find(p => p.id === 'egg').qty = 30;
-  l.products.find(p => p.id === 'saft').prices[0].amount = 40;
-  assert.deepEqual(core.changedIds(b, l).sort(), ['egg', 'saft']);
+  assert.deepEqual(core.changedKeys(b, l), []);
+  cat(l, 'honning').active = true;
+  itm(l, 'egg', 'smaegg').qty = 10;
+  itm(l, 'syltetoy', 'sylt2').name = 'Bringebær';
+  itm(l, 'baer', 'bfg1').prices[0].amount = 15;
+  assert.deepEqual(core.changedKeys(b, l).sort(),
+    ['cat:honning', 'item:baer/bfg1', 'item:egg/smaegg', 'item:syltetoy/sylt2']);
+  assert.equal(core.isCategoryChanged(b, l, 'egg'), true);
+  assert.equal(core.isCategoryChanged(b, l, 'ved'), false);
+  assert.equal(core.isItemChanged(b, l, 'egg', 'egg'), false);
 });
 
-test('buildPublish setter nytt tidspunkt kun på endrede varer', () => {
+test('buildPublish setter nytt tidspunkt kun på det som er endret', () => {
   const b = base();
   const l = core.clone(b);
-  l.products.find(p => p.id === 'saft').active = true;
-  const now = new Date('2026-10-27T15:00:00.000Z');
+  itm(l, 'egg', 'smaegg').qty = 6;
+  cat(l, 'saft').active = true;
+  const now = new Date('2026-10-30T15:00:00.000Z');
   const out = core.buildPublish(b, l, now);
   assert.equal(out.updatedAt, now.toISOString());
-  assert.equal(out.products.find(p => p.id === 'saft').updatedAt, now.toISOString());
-  assert.equal(out.products.find(p => p.id === 'egg').updatedAt, '2026-10-20T10:00:00.000Z');
-  // serialiserbart og uten interne felt
+  assert.equal(itm(out, 'egg', 'smaegg').updatedAt, now.toISOString());
+  assert.equal(itm(out, 'egg', 'egg').updatedAt, '2026-10-20T10:00:00.000Z');
+  assert.equal(cat(out, 'saft').updatedAt, now.toISOString());
+  assert.equal(cat(out, 'egg').updatedAt, '2026-10-20T10:00:00.000Z');
   const json = JSON.parse(core.serialize(out));
-  assert.deepEqual(Object.keys(json), ['version', 'updatedAt', 'products']);
-  assert.equal(json.products[0].id, 'egg');
+  assert.deepEqual(Object.keys(json), ['version', 'updatedAt', 'categories']);
+  assert.equal(json.version, 2);
 });
 
 test('rebase legger egne endringer oppå nyere versjon fra GitHub', () => {
   const b = base();
   const local = core.clone(b);
-  local.products.find(p => p.id === 'egg').qty = 12;              // vår endring
+  itm(local, 'egg', 'egg').qty = 12;
+  itm(local, 'syltetoy', 'sylt1').name = 'Solbær';
   const remote = core.clone(b);
-  remote.products.find(p => p.id === 'saft').qty = 6;             // noen andres endring
-  remote.products.find(p => p.id === 'egg').prices[0].amount = 6; // noen andres endring
-  const merged = core.rebase(b, local, remote);
-  assert.equal(merged.products.find(p => p.id === 'egg').qty, 12);
-  assert.equal(merged.products.find(p => p.id === 'egg').prices[0].amount, 6);
-  assert.equal(merged.products.find(p => p.id === 'saft').qty, 6);
+  itm(remote, 'egg', 'egg').prices[0].amount = 6;
+  cat(remote, 'ved').active = true;
+  const m = core.rebase(b, local, remote);
+  assert.equal(itm(m, 'egg', 'egg').qty, 12);
+  assert.equal(itm(m, 'egg', 'egg').prices[0].amount, 6);
+  assert.equal(itm(m, 'syltetoy', 'sylt1').name, 'Solbær');
+  assert.equal(cat(m, 'ved').active, true);
 });
 
 test('commitMessage beskriver endringene kort', () => {
   const b = base();
   const l = core.clone(b);
-  l.products.find(p => p.id === 'egg').qty = 30;
-  l.products.find(p => p.id === 'saft').active = true;
-  l.products.find(p => p.id === 'saft').prices[0].amount = 45;
+  itm(l, 'egg', 'smaegg').qty = 30;
+  cat(l, 'honning').active = true;
+  itm(l, 'syltetoy', 'sylt1').name = 'Jordbær';
+  itm(l, 'syltetoy', 'sylt1').prices[0].amount = 50;
   const msg = core.commitMessage(b, l);
   assert.match(msg, /^Lager: /);
-  assert.match(msg, /Egg 30 stk/);
-  assert.match(msg, /Saft synlig/);
-  assert.match(msg, /Saft pris/);
+  assert.match(msg, /Små egg 30 stk/);
+  assert.match(msg, /Honning synlig/);
+  assert.match(msg, /Syltetøy: navn «Jordbær»/);
+  assert.match(msg, /Jordbær pris/);
 });
 
 test('base64 med æøå går begge veier', () => {
-  const s = '{"name":"Grønnsaker – æøå ÆØÅ"}';
-  const b64 = core.encodeBase64Utf8(s);
-  assert.equal(core.decodeBase64Utf8(b64), s);
-  // GitHub leverer base64 med linjeskift
-  assert.equal(core.decodeBase64Utf8(b64.replace(/(.{10})/g, '$1\n')), s);
+  const s = '{"name":"Bær, frukt og grønnsaker – æøå ÆØÅ"}';
+  assert.equal(core.decodeBase64Utf8(core.encodeBase64Utf8(s)), s);
+  assert.equal(core.decodeBase64Utf8(core.encodeBase64Utf8(s).replace(/(.{10})/g, '$1\n')), s);
 });

@@ -1,4 +1,4 @@
-/* Myra gårdsutsalg v1.1 – oppdateringsside for selger (lagrer via GitHub) */
+/* Myra gårdsutsalg v1.3 – oppdateringsside for selger (lagrer via GitHub) */
 (function () {
   'use strict';
   var C = window.MYRA_CONFIG;
@@ -8,7 +8,6 @@
   var el = window.MyraDom.el;
 
   var STORE_KEY = 'myra-vault-v1';
-  var STEPS = [-12, -6, -1, 1, 6, 12];
 
   var $ = function (id) { return document.getElementById(id); };
   var screens = { setup: $('setup'), login: $('login'), admin: $('admin') };
@@ -18,7 +17,7 @@
   var local = null;      // versjonen selger redigerer
   var sha = null;
   var busy = false;
-  var cards = {};
+  var views = {};        // catId -> { root, toggle, meta, details, items: { itemId -> refs } }
 
   $('version').textContent = 'Myra gårdsutsalg v' + C.version;
 
@@ -60,6 +59,8 @@
     if (err.code === 'notfound') return 'Fant ikke datafila på GitHub. Sjekk at nøkkelen gjelder repoet ' + C.github.owner + '/' + C.github.repo + '.';
     return err.message || 'Noe gikk galt.';
   }
+
+  function dirty() { return !!(base && local && core.changedCount(base, local)); }
 
   function enterAdmin(c, file) {
     client = c;
@@ -126,30 +127,34 @@
   });
 
   // ---------- Endringer ----------
-  function product(id) {
-    return local.products.filter(function (p) { return p.id === id; })[0];
+  function category(catId) {
+    return local.categories.filter(function (c) { return c.id === catId; })[0];
+  }
+  function item(catId, itemId) {
+    return category(catId).items.filter(function (i) { return i.id === itemId; })[0];
   }
 
-  function change(id, fn) {
+  function change(catId, fn) {
     if (busy) return;
-    fn(product(id));
-    paint(cards[id]);
+    fn();
+    paintCategory(catId);
     setPending();
   }
 
   function setPending(text) {
-    var n = core.changedIds(base, local).length;
+    var n = core.changedCount(base, local);
     $('publish').disabled = busy || n === 0;
     $('discard').disabled = busy || n === 0;
     if (text) { $('pending').textContent = text; return; }
-    $('pending').textContent = n === 0 ? 'Ingen endringer' : (n === 1 ? '1 vare endret – ikke publisert' : n + ' varer endret – ikke publisert');
+    $('pending').textContent = n === 0 ? 'Ingen endringer'
+      : (n === 1 ? '1 endring – ikke publisert' : n + ' endringer – ikke publisert');
     $('pending').className = 'publishbar__status' + (n ? ' publishbar__status--dirty' : '');
   }
 
   function two(n) { return ('0' + n).slice(-2); }
 
   function publish() {
-    if (busy || !core.changedIds(base, local).length) return;
+    if (busy || !dirty()) return;
     busy = true;
     setError('admin-error', '');
     $('publish').textContent = 'Publiserer …';
@@ -196,16 +201,16 @@
 
   // Hent nyeste versjon når appen åpnes igjen og ingenting er ulagret
   document.addEventListener('visibilitychange', function () {
-    if (document.hidden || !client || busy || core.changedIds(base, local).length) return;
+    if (document.hidden || !client || busy || dirty()) return;
     client.getFile().then(function (file) {
-      if (busy || core.changedIds(base, local).length) return;
+      if (busy || dirty()) return;
       base = core.clone(file.data); local = core.clone(file.data); sha = file.sha;
       renderAll(); setPending();
     }).catch(function () { /* prøver igjen neste gang */ });
   });
 
   window.addEventListener('beforeunload', function (e) {
-    if (local && base && core.changedIds(base, local).length) { e.preventDefault(); e.returnValue = ''; }
+    if (dirty()) { e.preventDefault(); e.returnValue = ''; }
   });
 
   // ---------- Logg ut / glem ----------
@@ -216,7 +221,7 @@
   }
 
   $('lock').addEventListener('click', function () {
-    if (local && core.changedIds(base, local).length) {
+    if (dirty()) {
       setError('admin-error', 'Du har endringer som ikke er publisert. Publiser eller forkast dem først.');
       return;
     }
@@ -244,92 +249,152 @@
   twoTap($('forget'), 'Glem denne enheten', forget);
   twoTap($('login-forget'), 'Bytt GitHub-nøkkel', forget);
 
-  // ---------- Kort per vare ----------
-  function paint(c) {
-    var p = product(c.id);
-    if (document.activeElement !== c.qty) c.qty.value = String(p.qty);
-    c.toggle.setAttribute('aria-pressed', p.active ? 'true' : 'false');
-    c.toggle.textContent = p.active ? 'Synlig' : 'Skjult';
-    c.toggle.setAttribute('aria-label', p.active
-      ? p.name + ' vises på kundesiden. Trykk for å skjule.'
-      : p.name + ' er skjult og står som «Kommer senere». Trykk for å vise.');
-    c.prices.forEach(function (input, i) {
-      if (document.activeElement !== input && p.prices[i]) {
-        input.value = p.prices[i].amount === null ? '' : String(p.prices[i].amount).replace('.', ',');
-      }
-    });
-    var changed = core.changedIds(base, local).indexOf(c.id) !== -1;
-    c.root.classList.toggle('acard--dirty', changed);
-    c.meta.textContent = changed ? 'Endret – ikke publisert'
-      : (p.updatedAt ? core.formatUpdated(new Date(p.updatedAt)) : '');
-    c.meta.className = 'acard__meta' + (changed ? ' acard__meta--saving' : '');
+  // ---------- Visning: kategori med varer ----------
+  function itemLabel(cat, it, n) {
+    if (!cat.namedItems) return it.name;
+    return it.name.trim() || ('Type ' + (n + 1));
   }
 
-  function buildCard(p) {
-    var c = { id: p.id, prices: [] };
-    var qtyId = 'qty-' + p.id;
-    c.meta = el('span', { class: 'acard__meta' });
-    c.toggle = el('button', { type: 'button', class: 'toggle', onclick: function () {
-      change(p.id, function (x) { x.active = !x.active; });
-    } });
-    c.qty = el('input', {
-      id: qtyId, type: 'text', inputmode: 'numeric', pattern: '[0-9]*', autocomplete: 'off',
-      onchange: function () { change(p.id, function (x) { x.qty = core.parseQty(c.qty.value); }); },
-      onfocus: function () { c.qty.select(); }
+  function paintCategory(catId) {
+    var v = views[catId], cat = category(catId);
+    v.toggle.setAttribute('aria-pressed', cat.active ? 'true' : 'false');
+    v.toggle.textContent = cat.active ? 'Synlig' : 'Skjult';
+    v.toggle.setAttribute('aria-label', cat.active
+      ? cat.name + ' vises på kundesiden. Trykk for å skjule.'
+      : cat.name + ' er skjult og står som «Kommer senere». Trykk for å vise.');
+    var catChanged = core.isCategoryChanged(base, local, catId);
+    v.root.classList.toggle('acard--dirty', catChanged);
+    var last = core.latestUpdate(cat);
+    v.meta.textContent = catChanged ? 'Endret – ikke publisert' : (last ? core.formatUpdated(last) : '');
+    v.meta.className = 'acard__meta' + (catChanged ? ' acard__meta--saving' : '');
+
+    cat.items.forEach(function (it, n) {
+      var r = v.items[it.id];
+      if (document.activeElement !== r.qty) r.qty.value = String(it.qty);
+      if (r.name && document.activeElement !== r.name) r.name.value = it.name;
+      r.prices.forEach(function (input, i) {
+        if (document.activeElement !== input && it.prices[i]) {
+          input.value = it.prices[i].amount === null ? '' : String(it.prices[i].amount).replace('.', ',');
+        }
+      });
+      if (r.title) r.title.textContent = itemLabel(cat, it, n);
+      r.root.classList.toggle('aitem--dirty', core.isItemChanged(base, local, catId, it.id));
+      r.root.classList.toggle('aitem--unnamed', cat.namedItems && !it.name.trim());
     });
-    var steps = STEPS.map(function (n) {
-      var abs = Math.abs(n);
+  }
+
+  function buildItem(cat, it, n, refs) {
+    var key = cat.id + '-' + it.id;
+    var qtyId = 'qty-' + key;
+    var label = function () { return itemLabel(cat, item(cat.id, it.id), n); };
+
+    if (cat.namedItems) {
+      var nameId = 'name-' + key;
+      refs.name = el('input', {
+        id: nameId, class: 'input', type: 'text', autocomplete: 'off', maxlength: '40',
+        placeholder: cat.id === 'syltetoy' ? 'f.eks. Jordbærsyltetøy' : 'f.eks. Jordbær',
+        onchange: function () {
+          change(cat.id, function () { item(cat.id, it.id).name = refs.name.value.trim(); });
+        }
+      });
+    }
+    refs.title = (cat.items.length > 1 || cat.namedItems) ? el('h3', { class: 'aitem__title' }) : null;
+
+    refs.qty = el('input', {
+      id: qtyId, type: 'text', inputmode: 'numeric', pattern: '[0-9]*', autocomplete: 'off',
+      onchange: function () { change(cat.id, function () { item(cat.id, it.id).qty = core.parseQty(refs.qty.value); }); },
+      onfocus: function () { refs.qty.select(); }
+    });
+
+    var steps = cat.steps.map(function (s) {
+      var abs = Math.abs(s);
       return el('button', {
-        type: 'button', class: 'step' + (n > 0 ? ' step--plus' : ''),
-        'aria-label': (n > 0 ? 'Legg til ' : 'Trekk fra ') + abs + ' ' + p.unit,
-        text: (n > 0 ? '+' : '−') + abs,
-        onclick: function () { change(p.id, function (x) { x.qty = Math.max(0, x.qty + n); }); }
+        type: 'button', class: 'step' + (s > 0 ? ' step--plus' : ''),
+        'aria-label': (s > 0 ? 'Legg til ' : 'Trekk fra ') + abs + ' ' + it.unit + ' – ' + label(),
+        text: (s > 0 ? '+' : '−') + abs,
+        onclick: function () {
+          change(cat.id, function () { var x = item(cat.id, it.id); x.qty = Math.max(0, x.qty + s); });
+        }
       });
     });
-    var priceRows = p.prices.map(function (pr, i) {
-      var inputId = 'price-' + p.id + '-' + i;
+
+    refs.prices = [];
+    var priceRows = it.prices.map(function (pr, i) {
+      var inputId = 'price-' + key + '-' + i;
       var input = el('input', {
         id: inputId, class: 'input', type: 'text', inputmode: 'decimal', autocomplete: 'off', placeholder: '0',
         onchange: function () {
           var val = core.parseAmount(input.value);
           if (val === undefined) {
-            c.meta.textContent = 'Ugyldig pris – bruk bare tall';
-            c.meta.className = 'acard__meta acard__meta--error';
+            views[cat.id].meta.textContent = 'Ugyldig pris – bruk bare tall';
+            views[cat.id].meta.className = 'acard__meta acard__meta--error';
             input.value = '';
             return;
           }
-          change(p.id, function (x) { x.prices[i].amount = val; });
+          change(cat.id, function () { item(cat.id, it.id).prices[i].amount = val; });
         },
         onfocus: function () { input.select(); }
       });
-      c.prices.push(input);
-      var label = pr.label.charAt(0).toUpperCase() + pr.label.slice(1);
+      refs.prices.push(input);
       return el('div', { class: 'price-row' }, [
-        el('label', { for: inputId, text: label }),
+        el('label', { for: inputId, text: 'Pris ' + pr.label }),
         el('span', { class: 'price-row__right' }, [input, el('span', { class: 'kr', text: 'kr' })])
       ]);
     });
-    c.root = el('section', { class: 'acard', 'aria-labelledby': 'h-' + p.id }, [
-      el('div', { class: 'acard__head' }, [
-        el('div', null, [el('h2', { class: 'acard__title', id: 'h-' + p.id, text: p.name }), c.meta]),
-        c.toggle
-      ]),
+
+    refs.root = el('div', { class: 'aitem', 'data-item': it.id }, [
+      refs.title,
+      refs.name ? el('div', { class: 'field' }, [
+        el('label', { for: refs.name.id, text: 'Navn' }), refs.name
+      ]) : null,
       el('div', { class: 'acard__qty' }, [
-        el('label', { for: qtyId, class: 'visually-hidden', text: 'Antall ' + p.name.toLowerCase() + ' på lager' }),
-        c.qty,
-        el('span', { text: p.unit })
+        el('label', { for: qtyId, class: 'visually-hidden', text: 'Antall ' + label() }),
+        refs.qty,
+        el('span', { text: it.unit })
       ]),
-      el('div', { class: 'steps' }, steps),
-      priceRows.length ? el('div', { class: 'pricebox' }, [el('span', { class: 'pricebox__label', text: 'Pris' })].concat(priceRows)) : null
+      el('div', { class: 'steps steps--' + cat.steps.length }, steps),
+      priceRows.length ? el('div', { class: 'pricebox' }, priceRows) : null
     ]);
-    cards[p.id] = c;
-    paint(c);
-    return c.root;
+    return refs.root;
+  }
+
+  function buildCategory(cat) {
+    var v = { items: {} };
+    v.meta = el('span', { class: 'acard__meta' });
+    v.toggle = el('button', { type: 'button', class: 'toggle', onclick: function () {
+      change(cat.id, function () { var c = category(cat.id); c.active = !c.active; });
+    } });
+    var itemNodes = cat.items.map(function (it, n) {
+      var refs = {};
+      v.items[it.id] = refs;
+      return buildItem(cat, it, n, refs);
+    });
+    var body;
+    if (cat.items.length > 2) {
+      // Mange varer: samlet i en sammenleggbar seksjon, åpen når kategorien er synlig
+      v.details = el('details', { class: 'acat__details', open: cat.active }, [
+        el('summary', { text: cat.namedItems ? 'Varer og navn (' + cat.items.length + ')' : 'Varer (' + cat.items.length + ')' }),
+        el('div', { class: 'acat__items' }, itemNodes)
+      ]);
+      body = v.details;
+    } else {
+      body = el('div', { class: 'acat__items' }, itemNodes);
+    }
+    v.root = el('section', { class: 'acard', 'aria-labelledby': 'h-' + cat.id, 'data-category': cat.id }, [
+      el('div', { class: 'acard__head' }, [
+        el('div', null, [el('h2', { class: 'acard__title', id: 'h-' + cat.id, text: cat.name }), v.meta]),
+        v.toggle
+      ]),
+      body
+    ]);
+    views[cat.id] = v;
+    paintCategory(cat.id);
+    return v.root;
   }
 
   function renderAll() {
-    cards = {};
-    $('admin-list').replaceChildren.apply($('admin-list'), local.products.map(buildCard));
+    views = {};
+    $('admin-list').replaceChildren.apply($('admin-list'), local.categories.map(buildCategory));
   }
 
   // ---------- Start ----------

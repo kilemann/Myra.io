@@ -1,53 +1,335 @@
 {
-  "version": 1,
+  "version": 2,
   "updatedAt": "2026-10-27T15:00:00.000Z",
-  "products": [
+  "categories": [
     {
       "id": "egg",
       "sort": 10,
       "name": "Egg",
       "note": "Ferske egg fra gården",
-      "unit": "stk",
-      "qty": 0,
       "active": true,
-      "prices": [
-        { "label": "per egg", "amount": null },
-        { "label": "per brett (12 stk)", "amount": null }
+      "namedItems": false,
+      "steps": [
+        -12,
+        -6,
+        -1,
+        1,
+        6,
+        12
       ],
-      "updatedAt": "2026-10-27T15:00:00.000Z"
+      "updatedAt": "2026-10-27T15:00:00.000Z",
+      "items": [
+        {
+          "id": "egg",
+          "name": "Egg",
+          "unit": "stk",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per egg",
+              "amount": null
+            },
+            {
+              "label": "per brett (12 stk)",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        },
+        {
+          "id": "smaegg",
+          "name": "Små egg",
+          "unit": "stk",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per egg",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        }
+      ]
     },
     {
       "id": "saft",
       "sort": 20,
       "name": "Saft",
       "note": "Hjemmelaget",
-      "unit": "flasker",
-      "qty": 0,
       "active": false,
-      "prices": [{ "label": "per flaske", "amount": null }],
-      "updatedAt": "2026-10-27T15:00:00.000Z"
+      "namedItems": false,
+      "steps": [
+        -5,
+        -1,
+        1,
+        5
+      ],
+      "updatedAt": "2026-10-27T15:00:00.000Z",
+      "items": [
+        {
+          "id": "saft",
+          "name": "Saft",
+          "unit": "flasker",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per flaske",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "honning",
+      "sort": 30,
+      "name": "Honning",
+      "note": "",
+      "active": false,
+      "namedItems": false,
+      "steps": [
+        -5,
+        -1,
+        1,
+        5
+      ],
+      "updatedAt": "2026-10-27T15:00:00.000Z",
+      "items": [
+        {
+          "id": "honning",
+          "name": "Honning",
+          "unit": "bokser",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per boks",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "syltetoy",
+      "sort": 40,
+      "name": "Syltetøy",
+      "note": "",
+      "active": false,
+      "namedItems": true,
+      "steps": [
+        -5,
+        -1,
+        1,
+        5
+      ],
+      "updatedAt": "2026-10-27T15:00:00.000Z",
+      "items": [
+        {
+          "id": "sylt1",
+          "name": "",
+          "unit": "glass",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per glass",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        },
+        {
+          "id": "sylt2",
+          "name": "",
+          "unit": "glass",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per glass",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        },
+        {
+          "id": "sylt3",
+          "name": "",
+          "unit": "glass",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per glass",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        },
+        {
+          "id": "sylt4",
+          "name": "",
+          "unit": "glass",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per glass",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "baer",
+      "sort": 50,
+      "name": "Bær, frukt og grønnsaker",
+      "note": "Etter sesong",
+      "active": false,
+      "namedItems": true,
+      "steps": [
+        -5,
+        -1,
+        1,
+        5
+      ],
+      "updatedAt": "2026-10-27T15:00:00.000Z",
+      "items": [
+        {
+          "id": "bfg1",
+          "name": "",
+          "unit": "hg",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per hg",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        },
+        {
+          "id": "bfg2",
+          "name": "",
+          "unit": "hg",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per hg",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        },
+        {
+          "id": "bfg3",
+          "name": "",
+          "unit": "hg",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per hg",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        },
+        {
+          "id": "bfg4",
+          "name": "",
+          "unit": "hg",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per hg",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        },
+        {
+          "id": "bfg5",
+          "name": "",
+          "unit": "hg",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per hg",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        },
+        {
+          "id": "bfg6",
+          "name": "",
+          "unit": "hg",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per hg",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        },
+        {
+          "id": "bfg7",
+          "name": "",
+          "unit": "hg",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per hg",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        },
+        {
+          "id": "bfg8",
+          "name": "",
+          "unit": "hg",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per hg",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        }
+      ]
     },
     {
       "id": "ved",
-      "sort": 30,
+      "sort": 60,
       "name": "Ved",
       "note": "Til peis og vedovn",
-      "unit": "sekker",
-      "qty": 0,
       "active": false,
-      "prices": [{ "label": "per sekk", "amount": null }],
-      "updatedAt": "2026-10-27T15:00:00.000Z"
-    },
-    {
-      "id": "veg",
-      "sort": 40,
-      "name": "Grønnsaker",
-      "note": "Etter sesong",
-      "unit": "poser",
-      "qty": 0,
-      "active": false,
-      "prices": [{ "label": "per pose", "amount": null }],
-      "updatedAt": "2026-10-27T15:00:00.000Z"
+      "namedItems": false,
+      "steps": [
+        -5,
+        -1,
+        1,
+        5
+      ],
+      "updatedAt": "2026-10-27T15:00:00.000Z",
+      "items": [
+        {
+          "id": "ved",
+          "name": "Ved",
+          "unit": "sekker",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per sekk",
+              "amount": null
+            }
+          ],
+          "updatedAt": "2026-10-27T15:00:00.000Z"
+        }
+      ]
     }
   ]
 }

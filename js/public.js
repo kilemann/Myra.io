@@ -1,4 +1,4 @@
-/* Myra gårdsutsalg v1.1 – kundeside */
+/* Myra gårdsutsalg v1.3 – kundeside (kategorier med varer) */
 (function () {
   'use strict';
   var C = window.MYRA_CONFIG;
@@ -16,41 +16,85 @@
   var errorBanner = document.getElementById('error-banner');
   var lastJson = null;
 
-  function activeCard(p, now) {
-    var status = core.stockStatus(p.qty);
-    return el('article', { class: 'card' }, [
+  function badge(qty) {
+    var s = core.stockStatus(qty);
+    return el('span', { class: 'badge ' + s.cls, text: s.text });
+  }
+
+  function priceList(item, cls) {
+    return item.prices.length ? el('ul', { class: cls || 'prices' }, item.prices.map(function (pr) {
+      return el('li', { text: core.formatPrice(pr) });
+    })) : null;
+  }
+
+  function updated(cat, now) {
+    var d = core.latestUpdate(cat);
+    return d ? el('p', { class: 'updated', text: core.formatUpdated(d, now) }) : null;
+  }
+
+  // Én vare (honning, saft, ved): stort tall som før
+  function singleCard(cat, it, now) {
+    return el('article', { class: 'card', 'data-category': cat.id }, [
       el('div', { class: 'card__head' }, [
         el('div', null, [
-          el('h3', { class: 'card__title', text: p.name }),
-          p.note ? el('p', { class: 'card__note', text: p.note }) : null
+          el('h3', { class: 'card__title', text: cat.name }),
+          cat.note ? el('p', { class: 'card__note', text: cat.note }) : null
         ]),
-        el('span', { class: 'badge ' + status.cls, text: status.text })
+        badge(it.qty)
       ]),
       el('p', { class: 'qty', style: 'margin:0' }, [
-        el('span', { class: 'qty__num', text: String(p.qty) }),
-        el('span', { class: 'qty__unit', text: p.unit + ' tilgjengelig' })
+        el('span', { class: 'qty__num', text: String(it.qty) }),
+        el('span', { class: 'qty__unit', text: it.unit + ' tilgjengelig' })
       ]),
-      p.prices.length ? el('ul', { class: 'prices' }, p.prices.map(function (pr) {
-        return el('li', { text: core.formatPrice(pr) });
-      })) : null,
-      p.updatedAt ? el('p', { class: 'updated', text: core.formatUpdated(new Date(p.updatedAt), now) }) : null
+      priceList(it),
+      updated(cat, now)
     ]);
   }
 
-  function comingCard(p) {
-    return el('article', { class: 'card card--coming' }, [
+  // Flere varer (egg + små egg, syltetøy, bær/frukt/grønt): en liste
+  function listCard(cat, items, now) {
+    return el('article', { class: 'card', 'data-category': cat.id }, [
+      el('div', null, [
+        el('h3', { class: 'card__title', text: cat.name }),
+        cat.note ? el('p', { class: 'card__note', text: cat.note }) : null
+      ]),
+      el('ul', { class: 'items' }, items.map(function (it) {
+        return el('li', { class: 'item' }, [
+          el('div', { class: 'item__head' }, [
+            el('span', { class: 'item__name', text: it.name }),
+            badge(it.qty)
+          ]),
+          el('p', { class: 'item__qty' }, [
+            el('strong', { text: String(it.qty) }), ' ' + it.unit + ' tilgjengelig'
+          ]),
+          priceList(it, 'item__prices')
+        ]);
+      })),
+      updated(cat, now)
+    ]);
+  }
+
+  function comingCard(cat) {
+    return el('article', { class: 'card card--coming', 'data-category': cat.id }, [
       el('p', { class: 'coming-label', text: 'Kommer senere' }),
-      el('h3', { class: 'card__title', text: p.name }),
-      p.note ? el('p', { class: 'card__note', text: p.note }) : null
+      el('h3', { class: 'card__title', text: cat.name }),
+      cat.note ? el('p', { class: 'card__note', text: cat.note }) : null
     ]);
   }
 
   function render(data) {
     var now = new Date();
-    var active = data.products.filter(function (p) { return p.active; });
-    var coming = data.products.filter(function (p) { return !p.active; });
-    var nodes = active.map(function (p) { return activeCard(p, now); });
-    if (!active.length) nodes.push(el('p', { class: 'empty', text: 'Ingenting til salgs akkurat nå. Se innom igjen snart.' }));
+    var shown = [], coming = [];
+    data.categories.forEach(function (cat) {
+      var items = core.visibleItems(cat);
+      if (cat.active && items.length) shown.push({ cat: cat, items: items });
+      else coming.push(cat);
+    });
+    var nodes = shown.map(function (s) {
+      var single = s.items.length === 1 && !s.cat.namedItems && s.cat.items.length === 1;
+      return single ? singleCard(s.cat, s.items[0], now) : listCard(s.cat, s.items, now);
+    });
+    if (!shown.length) nodes.push(el('p', { class: 'empty', text: 'Ingenting til salgs akkurat nå. Se innom igjen snart.' }));
     nodes = nodes.concat(coming.map(comingCard));
     grid.replaceChildren.apply(grid, nodes);
     grid.setAttribute('aria-busy', 'false');
@@ -65,7 +109,7 @@
       })
       .then(function (text) {
         errorBanner.hidden = true;
-        if (text === lastJson) return; // ingen endring
+        if (text === lastJson) return;
         lastJson = text;
         render(core.normalizeData(JSON.parse(text)));
       })

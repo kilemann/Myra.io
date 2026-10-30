@@ -22,12 +22,12 @@ function fakeFetch(handler) {
 }
 
 test('getFile henter og dekoder fila med token', async () => {
-  const data = { version: 1, updatedAt: null, products: [{ id: 'egg', name: 'Egg', qty: 3 }] };
+  const data = { version: 2, updatedAt: null, categories: [{ id: 'egg', name: 'Egg', items: [{ id: 'egg', name: 'Egg', qty: 3 }] }] };
   const f = fakeFetch(() => ({ status: 200, body: { sha: 'abc', content: core.encodeBase64Utf8(JSON.stringify(data)) } }));
   const c = gh.createClient(Object.assign({ token: 'T', fetch: f }, settings));
   const res = await c.getFile();
   assert.equal(res.sha, 'abc');
-  assert.equal(res.data.products[0].qty, 3);
+  assert.equal(res.data.categories[0].items[0].qty, 3);
   const call = f.calls[0];
   assert.equal(call.url, 'https://api.github.com/repos/kilemann/myra.io/contents/data/products.json?ref=main');
   assert.equal(call.init.headers.Authorization, 'Bearer T');

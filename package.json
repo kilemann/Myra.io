@@ -1,6 +1,6 @@
 {
   "name": "myra-gardsutsalg",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "private": true,
   "description": "Myra gårdsutsalg – lagerstatus på GitHub Pages, oppdatert fra mobil via GitHub API",
   "scripts": {

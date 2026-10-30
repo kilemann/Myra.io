@@ -66,6 +66,8 @@ function fakeGitHub(initial) {
 // Fast testdata – uavhengig av hva som faktisk ligger i data/products.json
 const FIXTURE = path.join(__dirname, 'fixtures/products.json');
 const seed = () => JSON.parse(fs.readFileSync(FIXTURE, 'utf8'));
+const catOf = (d, c) => d.categories.find(x => x.id === c);
+const itemOf = (d, c, i) => catOf(d, c).items.find(x => x.id === i);
 
 test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installert' }, async t => {
   const srv = await serve();
@@ -88,11 +90,15 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       await page.waitForSelector('.card');
       const text = await page.locator('#products').innerText();
       assert.match(text, /Egg/);
+      assert.match(text, /Små egg/);
       assert.match(text, /Kommer senere/i);
       assert.match(text, /Ved/);
+      assert.doesNotMatch(text, /^Grønnsaker$/m);
       assert.ok(urls.some(u => /products\.json\?t=\d+/.test(u)), 'skal bruke cache-busting');
       const order = await page.locator('.card .card__title').allInnerTexts();
-      assert.deepEqual(order, ['Egg', 'Saft', 'Ved', 'Grønnsaker']);
+      assert.deepEqual(order, ['Egg', 'Saft', 'Honning', 'Syltetøy', 'Bær, frukt og grønnsaker', 'Ved']);
+      const eggCard = await page.locator('.card[data-category="egg"]').innerText();
+      assert.match(eggCard, /Små egg[\s\S]*Pris per egg kommer/);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 390);
     });
 
@@ -155,16 +161,19 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
     await t.test('endringer publiseres først når selger trykker Publiser', async () => {
       const putsBefore = gh.puts.length;
       assert.equal(await page.isDisabled('#publish'), true);
-      const egg = page.locator('section.acard', { has: page.locator('h2', { hasText: 'Egg' }) });
-      await egg.getByRole('button', { name: 'Legg til 6 stk' }).click();
-      await egg.getByRole('button', { name: 'Legg til 1 stk' }).click();
-      await page.fill('#price-egg-0', '5,5');
-      await page.locator('#price-egg-0').dispatchEvent('change');
-      const saft = page.locator('section.acard', { has: page.locator('h2', { hasText: 'Saft' }) });
-      await saft.locator('.toggle').click();
+      const egg = page.locator('section.acard[data-category="egg"] .aitem[data-item="egg"]');
+      await egg.getByRole('button', { name: 'Legg til 6 stk – Egg' }).click();
+      await egg.getByRole('button', { name: 'Legg til 1 stk – Egg' }).click();
+      await page.fill('#price-egg-egg-0', '5,5');
+      await page.locator('#price-egg-egg-0').dispatchEvent('change');
+      const small = page.locator('section.acard[data-category="egg"] .aitem[data-item="smaegg"]');
+      await small.getByRole('button', { name: 'Legg til 12 stk – Små egg' }).click();
+      await page.fill('#price-egg-smaegg-0', '4');
+      await page.locator('#price-egg-smaegg-0').dispatchEvent('change');
+      await page.locator('section.acard[data-category="saft"] .toggle').click();
       await page.waitForTimeout(800);
       assert.equal(gh.puts.length, putsBefore, 'ingen autolagring');
-      assert.match(await page.textContent('#pending'), /2 varer endret/);
+      assert.match(await page.textContent('#pending'), /3 endringer/);
       assert.equal(await page.isDisabled('#publish'), false);
 
       await page.click('#publish');
@@ -173,38 +182,76 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       const put = gh.puts[gh.puts.length - 1];
       assert.equal(put.committer.name, 'Myra lager');
       assert.match(put.message, /Egg 7 stk/);
-      const egg2 = gh.data.products.find(p => p.id === 'egg');
+      assert.match(put.message, /Små egg 12 stk/);
+      assert.equal(gh.data.version, 2);
+      const egg2 = itemOf(gh.data, 'egg', 'egg');
       assert.equal(egg2.qty, 7);
       assert.equal(egg2.prices[0].amount, 5.5);
-      assert.equal(gh.data.products.find(p => p.id === 'saft').active, true);
-      assert.ok(egg2.updatedAt);
-      assert.equal(gh.data.products.find(p => p.id === 'ved').updatedAt, seed().products.find(p => p.id === 'ved').updatedAt);
+      assert.equal(itemOf(gh.data, 'egg', 'smaegg').qty, 12);
+      assert.equal(itemOf(gh.data, 'egg', 'smaegg').prices[0].amount, 4);
+      assert.equal(catOf(gh.data, 'saft').active, true);
+      assert.notEqual(egg2.updatedAt, itemOf(seed(), 'egg', 'egg').updatedAt);
+      assert.equal(itemOf(gh.data, 'ved', 'ved').updatedAt, itemOf(seed(), 'ved', 'ved').updatedAt);
       assert.equal(await page.isDisabled('#publish'), true);
+    });
+
+    await t.test('syltetøy og bær: selger setter navn og pris, og slår på kategorien', async () => {
+      const sylt = page.locator('section.acard[data-category="syltetoy"]');
+      await sylt.locator('summary').click();
+      await page.fill('#name-syltetoy-sylt1', 'Jordbærsyltetøy');
+      await page.locator('#name-syltetoy-sylt1').dispatchEvent('change');
+      await page.fill('#qty-syltetoy-sylt1', '5');
+      await page.locator('#qty-syltetoy-sylt1').dispatchEvent('change');
+      await page.fill('#price-syltetoy-sylt1-0', '60');
+      await page.locator('#price-syltetoy-sylt1-0').dispatchEvent('change');
+      await sylt.locator('.toggle').click();
+      assert.equal(await sylt.locator('.aitem[data-item="sylt1"] .aitem__title').innerText(), 'Jordbærsyltetøy');
+
+      const baer = page.locator('section.acard[data-category="baer"]');
+      await baer.locator('summary').click();
+      assert.equal(await baer.locator('.aitem').count(), 8);
+      assert.equal(await page.inputValue('#name-baer-bfg3'), '');
+      await page.fill('#name-baer-bfg3', 'Poteter');
+      await page.locator('#name-baer-bfg3').dispatchEvent('change');
+      await page.fill('#price-baer-bfg3-0', '3,5');
+      await page.locator('#price-baer-bfg3-0').dispatchEvent('change');
+      assert.match(await baer.locator('label[for="price-baer-bfg3-0"]').innerText(), /per hg/);
+
+      await page.click('#publish');
+      await page.waitForFunction(() => /Publisert/.test(document.querySelector('#pending').textContent));
+      const s1 = itemOf(gh.data, 'syltetoy', 'sylt1');
+      assert.equal(s1.name, 'Jordbærsyltetøy');
+      assert.equal(s1.qty, 5);
+      assert.equal(s1.prices[0].amount, 60);
+      assert.equal(catOf(gh.data, 'syltetoy').active, true);
+      assert.equal(itemOf(gh.data, 'baer', 'bfg3').name, 'Poteter');
+      assert.equal(itemOf(gh.data, 'baer', 'bfg3').prices[0].amount, 3.5);
+      assert.equal(catOf(gh.data, 'baer').active, false);
     });
 
     await t.test('konflikt: henter nyeste versjon og beholder egne endringer', async () => {
       // noen andre publiserer i mellomtiden
-      gh.data.products.find(p => p.id === 'ved').qty = 9;
+      itemOf(gh.data, 'ved', 'ved').qty = 9;
       gh.sha = 'sha-50';
-      const egg = page.locator('section.acard', { has: page.locator('h2', { hasText: 'Egg' }) });
-      await egg.getByRole('button', { name: 'Trekk fra 1 stk' }).click();
+      const egg = page.locator('section.acard[data-category="egg"] .aitem[data-item="egg"]');
+      await egg.getByRole('button', { name: 'Trekk fra 1 stk – Egg' }).click();
       await page.click('#publish');
       await page.waitForSelector('#admin-error:not([hidden])');
       assert.match(await page.textContent('#admin-error'), /endret av noen andre/i);
-      assert.equal(await page.inputValue('#qty-egg'), '6');
-      assert.equal(await page.inputValue('#qty-ved'), '9');
+      assert.equal(await page.inputValue('#qty-egg-egg'), '6');
+      assert.equal(await page.inputValue('#qty-ved-ved'), '9');
       await page.click('#publish');
       await page.waitForFunction(() => /Publisert/.test(document.querySelector('#pending').textContent));
-      assert.equal(gh.data.products.find(p => p.id === 'egg').qty, 6);
-      assert.equal(gh.data.products.find(p => p.id === 'ved').qty, 9);
+      assert.equal(itemOf(gh.data, 'egg', 'egg').qty, 6);
+      assert.equal(itemOf(gh.data, 'ved', 'ved').qty, 9);
     });
 
     await t.test('Forkast tilbakestiller ulagrede endringer', async () => {
-      const egg = page.locator('section.acard', { has: page.locator('h2', { hasText: 'Egg' }) });
-      await egg.getByRole('button', { name: 'Legg til 12 stk' }).click();
-      assert.equal(await page.inputValue('#qty-egg'), '18');
+      const egg = page.locator('section.acard[data-category="egg"] .aitem[data-item="egg"]');
+      await egg.getByRole('button', { name: 'Legg til 12 stk – Egg' }).click();
+      assert.equal(await page.inputValue('#qty-egg-egg'), '18');
       await page.click('#discard');
-      assert.equal(await page.inputValue('#qty-egg'), '6');
+      assert.equal(await page.inputValue('#qty-egg-egg'), '6');
       assert.equal(await page.isDisabled('#publish'), true);
     });
 

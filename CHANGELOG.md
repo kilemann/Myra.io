@@ -1,5 +1,16 @@
 # Versjonslogg
 
+## v1.3 – 2026-10-30
+- Nytt dataformat (v2): **kategorier med varer**. Eksisterende lager (egg, saft, ved) flyttes automatisk over.
+- **Egg** har nå to varer: *Egg* (pris per egg og per brett) og *Små egg* (eget antall og egen pris per egg).
+- **Grønnsaker** er fjernet som egen kategori.
+- Ny kategori **Honning** – pris per boks.
+- Ny kategori **Syltetøy** – 4 typer der selger skriver navnet selv; pris per glass.
+- Ny kategori **Bær, frukt og grønnsaker** – 8 typer der selger skriver navnet selv; pris og antall per hg.
+- Hver kategori slås av/på med Synlig/Skjult. Varer uten navn vises ikke for kundene.
+- Kundesiden viser kategorier med flere varer som en liste, og «Oppdatert …» per kategori.
+- Admin: kategorier med mange varer kan foldes sammen. Hurtigknapper ±1/±5 for alt unntatt egg (±1/±6/±12).
+
 ## v1.2 – 2026-10-27
 - Ny logo (variant A: kurv med saft, egg og gulrot i grønn sirkel) i toppen av kundesiden – `img/logo.svg`.
 - Logoen brukes som fane-ikon, og som `img/logo-180.png` når kundesiden legges på hjemskjermen.
