@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-10-30T19:29:58.952Z",
+  "updatedAt": "2026-10-30T19:41:40.556Z",
   "categories": [
     {
       "id": "egg",
@@ -324,14 +324,14 @@
           "id": "ved",
           "name": "Ved",
           "unit": "sekker",
-          "qty": 0,
+          "qty": 1,
           "prices": [
             {
               "label": "per sekk",
               "amount": null
             }
           ],
-          "updatedAt": "2026-10-27T15:00:00.000Z"
+          "updatedAt": "2026-10-30T19:41:40.556Z"
         }
       ]
     }
