@@ -74,7 +74,7 @@ Hvis noen andre har publisert i mellomtiden, henter siden den nyeste versjonen o
 
 | Kategori | Varer | Pris |
 |---|---|---|
-| Egg | Egg, Små egg | per egg / per brett (12 stk) – små egg: per egg |
+| Egg | Egg, Små egg | per egg og per brett (12 stk) for begge |
 | Saft | Saft | per flaske |
 | Honning | Honning | per boks |
 | Syltetøy | 4 typer, navn settes i admin | per glass |

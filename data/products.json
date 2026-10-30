@@ -45,6 +45,10 @@
             {
               "label": "per egg",
               "amount": 6
+            },
+            {
+              "label": "per brett (12 stk)",
+              "amount": null
             }
           ],
           "updatedAt": "2026-10-30T19:29:58.952Z"

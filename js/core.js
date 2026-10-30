@@ -44,7 +44,7 @@
         { id: 'egg', sort: 10, name: 'Egg', note: 'Ferske egg fra gården', active: true, namedItems: false,
           steps: EGG_STEPS, updatedAt: null,
           items: [item('egg', 'Egg', 'stk', ['per egg', 'per brett (12 stk)']),
-                  item('smaegg', 'Små egg', 'stk', ['per egg'])] },
+                  item('smaegg', 'Små egg', 'stk', ['per egg', 'per brett (12 stk)'])] },
         { id: 'saft', sort: 20, name: 'Saft', note: 'Hjemmelaget', active: false, namedItems: false,
           steps: DEFAULT_STEPS, updatedAt: null,
           items: [item('saft', 'Saft', 'flasker', ['per flaske'])] },
@@ -123,11 +123,30 @@
     return d;
   }
 
+  // Legger til prisfelt som er nye i standardoppsettet (f.eks. «per brett» for små egg),
+  // uten å røre priser selger allerede har satt.
+  function addMissingPrices(cats) {
+    var defaults = defaultData().categories;
+    cats.forEach(function (c) {
+      var dc = defaults.filter(function (x) { return x.id === c.id; })[0];
+      if (!dc) return;
+      c.items.forEach(function (it) {
+        var di = dc.items.filter(function (x) { return x.id === it.id; })[0];
+        if (!di) return;
+        di.prices.forEach(function (dp) {
+          var has = it.prices.some(function (p) { return p.label === dp.label; });
+          if (!has) it.prices.push({ label: dp.label, amount: null });
+        });
+      });
+    });
+    return cats;
+  }
+
   function normalizeData(raw) {
     raw = (raw && typeof raw === 'object') ? raw : {};
     if (!Array.isArray(raw.categories) && Array.isArray(raw.products)) raw = migrateV1(raw);
     var cats = Array.isArray(raw.categories) ? raw.categories.map(normalizeCategory) : [];
-    cats = cats.filter(function (c) { return c.id; });
+    cats = addMissingPrices(cats.filter(function (c) { return c.id; }));
     cats.sort(function (a, b) { return a.sort - b.sort; });
     return { version: DATA_VERSION, updatedAt: raw.updatedAt ? String(raw.updatedAt) : null, categories: cats };
   }

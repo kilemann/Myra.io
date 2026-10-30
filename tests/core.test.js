@@ -18,7 +18,7 @@ test('standardoppsettet har riktige kategorier og varer', () => {
   const d = core.defaultData();
   assert.deepEqual(d.categories.map(c => c.id), ['egg', 'saft', 'honning', 'syltetoy', 'baer', 'ved']);
   assert.deepEqual(cat(d, 'egg').items.map(i => i.name), ['Egg', 'Små egg']);
-  assert.equal(itm(d, 'egg', 'smaegg').prices.length, 1);
+  assert.equal(itm(d, 'egg', 'smaegg').prices.length, 2);
   assert.equal(itm(d, 'honning', 'honning').prices[0].label, 'per boks');
   assert.equal(cat(d, 'syltetoy').items.length, 4);
   assert.ok(cat(d, 'syltetoy').namedItems);
@@ -46,6 +46,21 @@ test('v1-data flyttes over til v2 uten å miste antall, pris og synlighet', () =
   assert.equal(cat(d, 'saft').active, true);
   assert.equal(itm(d, 'egg', 'smaegg').qty, 0);
   assert.ok(!d.categories.some(c => c.id === 'veg'), 'grønnsaker er fjernet som egen kategori');
+});
+
+test('små egg har pris per egg og per brett', () => {
+  assert.deepEqual(itm(core.defaultData(), 'egg', 'smaegg').prices.map(p => p.label), ['per egg', 'per brett (12 stk)']);
+});
+
+test('nye prisfelt legges til i eksisterende data uten å røre satte priser', () => {
+  const old = { version: 2, categories: [{ id: 'egg', name: 'Egg', active: true, items: [
+    { id: 'egg', name: 'Egg', qty: 24, prices: [{ label: 'per egg', amount: 6 }, { label: 'per brett (12 stk)', amount: 60 }] },
+    { id: 'smaegg', name: 'Små egg', qty: 6, prices: [{ label: 'per egg', amount: 4 }] }
+  ] }] };
+  const d = core.normalizeData(old);
+  assert.deepEqual(itm(d, 'egg', 'smaegg').prices, [{ label: 'per egg', amount: 4 }, { label: 'per brett (12 stk)', amount: null }]);
+  assert.equal(itm(d, 'egg', 'egg').prices.length, 2);
+  assert.equal(itm(d, 'egg', 'smaegg').qty, 6);
 });
 
 test('normalizeData tåler tomt eller ødelagt innhold', () => {

@@ -1,5 +1,9 @@
 # Versjonslogg
 
+## v1.3.1 – 2026-10-30
+- Små egg har fått pris **per brett (12 stk)** i tillegg til pris per egg.
+- Nye prisfelt i standardoppsettet legges automatisk til i eksisterende lagerdata, uten å endre priser som allerede er satt.
+
 ## v1.3 – 2026-10-30
 - Nytt dataformat (v2): **kategorier med varer**. Eksisterende lager (egg, saft, ved) flyttes automatisk over.
 - **Egg** har nå to varer: *Egg* (pris per egg og per brett) og *Små egg* (eget antall og egen pris per egg).
