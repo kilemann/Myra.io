@@ -85,7 +85,7 @@
       "id": "honning",
       "sort": 30,
       "name": "Honning",
-      "note": "",
+      "note": "Fra Myra bier",
       "active": false,
       "namedItems": false,
       "steps": [
@@ -115,7 +115,7 @@
       "id": "syltetoy",
       "sort": 40,
       "name": "Syltetøy",
-      "note": "",
+      "note": "Hjemmelaget",
       "active": false,
       "namedItems": true,
       "steps": [
