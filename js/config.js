@@ -22,7 +22,7 @@ window.MYRA_CONFIG = {
     kicker: 'Gårdsutsalg',
     payment: 'Vipps : +4747842952',
     address: 'Høvågveien 350',
-    hours: 'Åpent'
+    hours: 'Åpent. Delvis selvbetjent'
   },
 
   // Hvor ofte kundesiden ser etter nye tall (sekunder)
