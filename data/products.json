@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-10-30T19:41:40.556Z",
+  "updatedAt": "2026-10-30T19:42:28.805Z",
   "categories": [
     {
       "id": "egg",
@@ -48,10 +48,10 @@
             },
             {
               "label": "per brett (12 stk)",
-              "amount": null
+              "amount": 60
             }
           ],
-          "updatedAt": "2026-10-30T19:29:58.952Z"
+          "updatedAt": "2026-10-30T19:42:28.805Z"
         }
       ]
     },
