@@ -20,9 +20,9 @@ window.MYRA_CONFIG = {
   shop: {
     name: 'Myra',
     kicker: 'Gårdsutsalg',
-    payment: 'Vipps (nummer kommer senere)',
-    address: 'Kommer senere',
-    hours: 'Kommer senere'
+    payment: 'Vipps : +4747842952',
+    address: 'Høvågveien 350',
+    hours: 'Åpent'
   },
 
   // Hvor ofte kundesiden ser etter nye tall (sekunder)
