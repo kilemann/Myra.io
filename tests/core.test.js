@@ -195,6 +195,30 @@ test('latestUpdate gir nyeste tidspunkt i kategorien', () => {
   assert.equal(core.latestUpdate(c).toISOString(), '2026-10-30T09:00:00.000Z');
 });
 
+test('unitFor: entall ved 1, flertall ellers', () => {
+  assert.equal(core.unitFor('flasker', 1), 'flaske');
+  assert.equal(core.unitFor('flasker', 2), 'flasker');
+  assert.equal(core.unitFor('flasker', 0), 'flasker');
+  assert.equal(core.unitFor('bokser', 1), 'boks');
+  assert.equal(core.unitFor('sekker', 1), 'sekk');
+  assert.equal(core.unitFor('sekker', 5), 'sekker');
+  assert.equal(core.unitFor('stk', 1), 'stk');
+  assert.equal(core.unitFor('glass', 1), 'glass');
+  assert.equal(core.unitFor('hg', 1), 'hg');
+});
+
+test('commitMessage bruker entall ved 1', () => {
+  const b = core.defaultData();
+  const l = core.clone(b);
+  itm(l, 'saft', 'baersaft').qty = 1;
+  itm(l, 'honning', 'flytende').qty = 1;
+  itm(l, 'ved', 'gran').qty = 2;
+  const msg = core.commitMessage(b, l);
+  assert.match(msg, /Bærsaft 1 flaske(,|$)/);
+  assert.match(msg, /Flytende honning 1 boks(,|$)/);
+  assert.match(msg, /Gran 2 sekker/);
+});
+
 test('stockStatus', () => {
   assert.equal(core.stockStatus(0).text, 'Midlertidig utsolgt');
   assert.equal(core.stockStatus(11).text, 'Få igjen');

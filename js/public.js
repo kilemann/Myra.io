@@ -44,7 +44,7 @@
       ]),
       el('p', { class: 'qty', style: 'margin:0' }, [
         el('span', { class: 'qty__num', text: String(it.qty) }),
-        el('span', { class: 'qty__unit', text: it.unit + ' tilgjengelig' })
+        el('span', { class: 'qty__unit', text: core.unitFor(it.unit, it.qty) + ' tilgjengelig' })
       ]),
       priceList(it),
       updated(cat, now)
@@ -70,7 +70,7 @@
             badge(it.qty)
           ]),
           out ? null : el('p', { class: 'item__qty' }, [
-            el('strong', { text: String(it.qty) }), ' ' + it.unit + ' tilgjengelig'
+            el('strong', { text: String(it.qty) }), ' ' + core.unitFor(it.unit, it.qty) + ' tilgjengelig'
           ]),
           priceList(it, 'item__prices')
         ]);

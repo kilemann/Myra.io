@@ -277,6 +277,7 @@
     cat.items.forEach(function (it, n) {
       var r = v.items[it.id];
       if (document.activeElement !== r.qty) r.qty.value = String(it.qty);
+      r.unit.textContent = core.unitFor(it.unit, it.qty);
       if (r.name && document.activeElement !== r.name) r.name.value = it.name;
       r.prices.forEach(function (input, i) {
         if (document.activeElement !== input && it.prices[i]) {
@@ -316,7 +317,7 @@
       var abs = Math.abs(s);
       return el('button', {
         type: 'button', class: 'step' + (s > 0 ? ' step--plus' : ''),
-        'aria-label': (s > 0 ? 'Legg til ' : 'Trekk fra ') + abs + ' ' + it.unit + ' – ' + label(),
+        'aria-label': (s > 0 ? 'Legg til ' : 'Trekk fra ') + abs + ' ' + core.unitFor(it.unit, abs) + ' – ' + label(),
         text: (s > 0 ? '+' : '−') + abs,
         onclick: function () {
           change(cat.id, function () { var x = item(cat.id, it.id); x.qty = Math.max(0, x.qty + s); });
@@ -356,7 +357,7 @@
       el('div', { class: 'acard__qty' }, [
         el('label', { for: qtyId, class: 'visually-hidden', text: 'Antall ' + label() }),
         refs.qty,
-        el('span', { text: it.unit })
+        refs.unit = el('span', { class: 'acard__unit' })
       ]),
       el('div', { class: 'steps steps--' + cat.steps.length }, steps),
       priceRows.length ? el('div', { class: 'pricebox' }, priceRows) : null

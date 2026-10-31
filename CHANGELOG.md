@@ -1,5 +1,8 @@
 # Versjonslogg
 
+## v1.6.1 – 2026-10-31
+- Enheten står i entall når antallet er 1: «1 flaske», «1 boks», «1 sekk» (og fortsatt «2 flasker» osv.). Gjelder kundesiden, tallet i admin og commit-meldingene.
+
 ## v1.6 – 2026-10-31
 - **Ved** er delt i fire typer: Bjørk, Eik, Furu og Gran. Hver type har eget antall og egen pris per sekk.
 - Dataformat v4. Synligheten for ved beholdes. Den gamle enkeltvaren «Ved» (1 sekk, uten pris) kunne ikke knyttes til én type og er ikke tatt med.

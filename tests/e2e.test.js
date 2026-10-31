@@ -203,6 +203,9 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       assert.equal(await saft.locator('.aitem .pricebox').count(), 0, 'ingen egen pris per type');
       await page.fill('#price-saft-felles-0', '45');
       await page.locator('#price-saft-felles-0').dispatchEvent('change');
+      await page.fill('#qty-saft-ripssaft', '1');
+      await page.locator('#qty-saft-ripssaft').dispatchEvent('change');
+      assert.equal(await saft.locator('.aitem[data-item="ripssaft"] .acard__unit').innerText(), 'flaske');
       await page.fill('#qty-saft-ripssaft', '4');
       await page.locator('#qty-saft-ripssaft').dispatchEvent('change');
 
@@ -269,6 +272,21 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       await shop.waitForSelector('.card[data-category="egg"]');
       const ids = () => shop.locator('#products .card').evaluateAll(cs => cs.map(x => x.dataset.category));
       assert.deepEqual(await ids(), ['honning', 'ved', 'egg', 'saft', 'syltetoy', 'baer']);
+
+      // Entall ved 1: «1 sekk», «2 bokser»
+      const vedText = await shop.locator('.card[data-category="ved"]').innerText();
+      assert.match(vedText, /2\s*sekker tilgjengelig/);
+      c('ved').items[2].qty = 1;
+      c('honning').items[0].qty = 1;
+      c('saft').items[0].qty = 1;
+      body = core.serialize(d);
+      await shop.reload();
+      await shop.waitForSelector('.card[data-category="ved"]');
+      assert.match(await shop.locator('.card[data-category="ved"]').innerText(), /1\s*sekk tilgjengelig/);
+      assert.match(await shop.locator('.card[data-category="honning"]').innerText(), /1\s*boks tilgjengelig/);
+      assert.match(await shop.locator('.card[data-category="saft"]').innerText(), /1\s*flaske tilgjengelig/);
+      c('ved').items[2].qty = 2; c('honning').items[0].qty = 0; c('saft').items[0].qty = 0;
+      body = core.serialize(d);
 
       // Egg kommer inn igjen -> øverst
       c('egg').items[1].qty = 6;

@@ -270,6 +270,12 @@
     return stamps.length ? new Date(Math.max.apply(null, stamps)) : null;
   }
 
+  // Enhet i riktig tall: 1 flaske / 2 flasker. Enheter uten egen entallsform (stk, glass, hg) er like.
+  var SINGULAR = { flasker: 'flaske', bokser: 'boks', sekker: 'sekk', poser: 'pose' };
+  function unitFor(unit, qty) {
+    return Number(qty) === 1 && SINGULAR[unit] ? SINGULAR[unit] : unit;
+  }
+
   function stockStatus(qty) {
     if (qty <= 0) return { text: 'Midlertidig utsolgt', cls: 'badge--out' };
     if (qty < 12) return { text: 'Få igjen', cls: 'badge--low' };
@@ -412,7 +418,7 @@
         if (!bi) return;
         var label = i.name || bi.name || (c.name + ' ' + i.id);
         if (i.name !== bi.name) parts.push(c.name + ': ' + (i.name ? 'navn «' + i.name + '»' : 'navn fjernet'));
-        if (i.qty !== bi.qty) parts.push(label + ' ' + i.qty + ' ' + i.unit);
+        if (i.qty !== bi.qty) parts.push(label + ' ' + i.qty + ' ' + unitFor(i.unit, i.qty));
         if (JSON.stringify(i.prices) !== JSON.stringify(bi.prices)) parts.push(label + ' pris');
       });
     });
@@ -444,6 +450,7 @@
     orderForCustomers: orderForCustomers,
     latestUpdate: latestUpdate,
     stockStatus: stockStatus,
+    unitFor: unitFor,
     formatUpdated: formatUpdated,
     formatPrice: formatPrice,
     parseAmount: parseAmount,
