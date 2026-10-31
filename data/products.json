@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "updatedAt": "2026-10-31T12:35:17.388Z",
   "categories": [
     {
@@ -362,17 +362,56 @@
       "prices": [],
       "items": [
         {
-          "id": "ved",
-          "name": "Ved",
+          "id": "bjork",
+          "name": "Bjørk",
           "unit": "sekker",
-          "qty": 1,
+          "qty": 0,
           "prices": [
             {
               "label": "per sekk",
               "amount": null
             }
           ],
-          "updatedAt": "2026-10-30T19:41:40.556Z"
+          "updatedAt": null
+        },
+        {
+          "id": "eik",
+          "name": "Eik",
+          "unit": "sekker",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per sekk",
+              "amount": null
+            }
+          ],
+          "updatedAt": null
+        },
+        {
+          "id": "furu",
+          "name": "Furu",
+          "unit": "sekker",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per sekk",
+              "amount": null
+            }
+          ],
+          "updatedAt": null
+        },
+        {
+          "id": "gran",
+          "name": "Gran",
+          "unit": "sekker",
+          "qty": 0,
+          "prices": [
+            {
+              "label": "per sekk",
+              "amount": null
+            }
+          ],
+          "updatedAt": null
         }
       ]
     }

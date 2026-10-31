@@ -2,8 +2,8 @@
  * Myra gårdsutsalg – kjernelogikk (ren JavaScript, ingen DOM).
  * Brukes av både kundesiden, admin-appen og testene (Node).
  *
- * Dataformat v3: kategorier med varer.
- *   { version: 3, updatedAt, categories: [
+ * Dataformat v4: kategorier med varer.
+ *   { version: 4, updatedAt, categories: [
  *       { id, sort, name, note, active, namedItems, steps, updatedAt,
  *         prices: [{ label, amount }],            // felles pris for alle varene (saft, syltetøy)
  *         items: [ { id, name, unit, qty, prices: [{ label, amount }], updatedAt } ] } ] }
@@ -18,7 +18,7 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  var DATA_VERSION = 3;
+  var DATA_VERSION = 4;
   var MONTHS = ['jan.', 'feb.', 'mars', 'april', 'mai', 'juni', 'juli', 'aug.', 'sep.', 'okt.', 'nov.', 'des.'];
   var EGG_STEPS = [-12, -6, -1, 1, 6, 12];
   var DEFAULT_STEPS = [-5, -1, 1, 5];
@@ -70,7 +70,10 @@
           items: numbered('bfg', 8, 'hg', 'per hg') },
         { id: 'ved', sort: 60, name: 'Ved', note: 'Til peis og vedovn', active: false, namedItems: false,
           steps: DEFAULT_STEPS, updatedAt: null, prices: [],
-          items: [item('ved', 'Ved', 'sekker', ['per sekk'])] }
+          items: [item('bjork', 'Bjørk', 'sekker', ['per sekk']),
+                  item('eik', 'Eik', 'sekker', ['per sekk']),
+                  item('furu', 'Furu', 'sekker', ['per sekk']),
+                  item('gran', 'Gran', 'sekker', ['per sekk'])] }
       ]
     };
   }
@@ -176,7 +179,7 @@
       return cat;
     });
     defaults.forEach(function (dc) { if (!findById(cats, dc.id)) cats.push(clone(dc)); });
-    return { version: DATA_VERSION, updatedAt: raw.updatedAt || null, categories: cats };
+    return { version: 3, updatedAt: raw.updatedAt || null, categories: cats };
   }
 
   // Legger til prisfelt som er nye i standardoppsettet (f.eks. «per brett» for små egg),
@@ -201,10 +204,28 @@
     return cats;
   }
 
+  // v3 -> v4: ved deles i fire typer (Bjørk, Eik, Furu, Gran) med hver sin pris.
+  // Synlighet og tidspunkt beholdes. Den gamle «Ved»-varen kan ikke knyttes til én type
+  // og tas derfor ikke med.
+  function migrateV3(raw) {
+    var defaults = defaultData().categories;
+    var cats = raw.categories.map(function (old) {
+      if (old.id !== 'ved') return old;
+      var hasTypes = (old.items || []).some(function (i) { return i.id === 'bjork'; });
+      if (hasTypes) return old;
+      var cat = clone(findById(defaults, 'ved'));
+      cat.active = !!old.active;
+      cat.updatedAt = old.updatedAt || null;
+      return cat;
+    });
+    return { version: 4, updatedAt: raw.updatedAt || null, categories: cats };
+  }
+
   function normalizeData(raw) {
     raw = (raw && typeof raw === 'object') ? raw : {};
     if (!Array.isArray(raw.categories) && Array.isArray(raw.products)) raw = migrateV1(raw);
     else if (Array.isArray(raw.categories) && (Number(raw.version) || 0) < 3) raw = migrateV2(raw);
+    if (Array.isArray(raw.categories) && (Number(raw.version) || 0) < 4) raw = migrateV3(raw);
     var cats = Array.isArray(raw.categories) ? raw.categories.map(normalizeCategory) : [];
     cats = addMissingPrices(cats.filter(function (c) { return c.id; }));
     cats.sort(function (a, b) { return a.sort - b.sort; });

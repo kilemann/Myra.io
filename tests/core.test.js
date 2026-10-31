@@ -16,7 +16,7 @@ const base = () => {
 
 test('standardoppsettet har riktige kategorier og varer', () => {
   const d = core.defaultData();
-  assert.equal(d.version, 3);
+  assert.equal(d.version, 4);
   assert.deepEqual(d.categories.map(c => c.id), ['egg', 'saft', 'honning', 'syltetoy', 'baer', 'ved']);
   assert.deepEqual(cat(d, 'egg').items.map(i => i.name), ['Egg', 'Små egg']);
   assert.equal(itm(d, 'egg', 'smaegg').prices.length, 2);
@@ -32,6 +32,36 @@ test('standardoppsettet har riktige kategorier og varer', () => {
   assert.equal(cat(d, 'baer').items.length, 8);
   assert.ok(cat(d, 'baer').namedItems);
   assert.ok(cat(d, 'baer').items.every(i => i.prices[0].label === 'per hg'));
+});
+
+test('ved har fire typer med hver sin pris per sekk', () => {
+  const d = core.defaultData();
+  const ved = cat(d, 'ved');
+  assert.deepEqual(ved.items.map(i => [i.id, i.name, i.unit]),
+    [['bjork', 'Bjørk', 'sekker'], ['eik', 'Eik', 'sekker'], ['furu', 'Furu', 'sekker'], ['gran', 'Gran', 'sekker']]);
+  assert.ok(ved.items.every(i => i.prices.length === 1 && i.prices[0].label === 'per sekk'));
+  assert.deepEqual(ved.prices, [], 'ingen felles pris – hver type har sin egen');
+});
+
+test('v3-data: ved deles i fire typer, synlighet beholdes, resten urørt', () => {
+  const v3 = core.defaultData();
+  v3.version = 3;
+  const old = v3.categories.find(c => c.id === 'ved');
+  old.active = true;
+  old.updatedAt = '2026-10-30T19:41:40.556Z';
+  old.items = [{ id: 'ved', name: 'Ved', unit: 'sekker', qty: 1, prices: [{ label: 'per sekk', amount: null }] }];
+  v3.categories.find(c => c.id === 'egg').items[0].qty = 24;
+  v3.categories.find(c => c.id === 'syltetoy').items[0].qty = 1;
+  const d = core.normalizeData(v3);
+  assert.equal(d.version, 4);
+  assert.deepEqual(cat(d, 'ved').items.map(i => i.name), ['Bjørk', 'Eik', 'Furu', 'Gran']);
+  assert.ok(cat(d, 'ved').items.every(i => i.qty === 0));
+  assert.equal(cat(d, 'ved').active, true);
+  assert.equal(cat(d, 'ved').updatedAt, '2026-10-30T19:41:40.556Z');
+  assert.equal(itm(d, 'egg', 'egg').qty, 24);
+  assert.equal(itm(d, 'syltetoy', 'bringebaer').qty, 1);
+  // stabilt: å normalisere på nytt endrer ingenting
+  assert.deepEqual(core.normalizeData(JSON.parse(core.serialize(d))), d);
 });
 
 test('v2-data flyttes til v3: faste navn, felles pris og honning delt i tre', () => {
@@ -51,7 +81,7 @@ test('v2-data flyttes til v3: faste navn, felles pris og honning delt i tre', ()
     { id: 'ved', name: 'Ved', active: false, items: [{ id: 'ved', name: 'Ved', unit: 'sekker', qty: 1, prices: [{ label: 'per sekk', amount: null }] }] }
   ] };
   const d = core.normalizeData(v2);
-  assert.equal(d.version, 3);
+  assert.equal(d.version, 4);
   assert.equal(itm(d, 'egg', 'egg').qty, 24);
   assert.deepEqual(itm(d, 'egg', 'smaegg').prices.map(p => p.amount), [4, 45]);
   assert.equal(cat(d, 'saft').active, true);
@@ -66,7 +96,7 @@ test('v2-data flyttes til v3: faste navn, felles pris og honning delt i tre', ()
   assert.equal(itm(d, 'syltetoy', 'bringebaer').qty, 0);
   assert.equal(itm(d, 'baer', 'bfg1').name, 'Poteter');
   assert.equal(itm(d, 'baer', 'bfg1').qty, 80);
-  assert.equal(itm(d, 'ved', 'ved').qty, 1);
+  assert.deepEqual(cat(d, 'ved').items.map(i => i.name), ['Bjørk', 'Eik', 'Furu', 'Gran']);
   // kjøres ikke på nytt når data allerede er v3
   const again = core.normalizeData(JSON.parse(core.serialize(d)));
   assert.deepEqual(again, d);
@@ -80,7 +110,7 @@ test('v1-data flyttes til nyeste format uten å miste egg, pris og synlighet', (
     { id: 'veg', name: 'Grønnsaker', qty: 5, active: true, prices: [] }
   ] };
   const d = core.normalizeData(v1);
-  assert.equal(d.version, 3);
+  assert.equal(d.version, 4);
   assert.equal(itm(d, 'egg', 'egg').qty, 24);
   assert.deepEqual(itm(d, 'egg', 'egg').prices.map(p => p.amount), [6, 60]);
   assert.equal(itm(d, 'egg', 'egg').updatedAt, '2026-10-30T12:00:00.000Z');
@@ -139,7 +169,7 @@ test('rekkefølge for kunder: helt utsolgte kategorier havner sist, også egg', 
   const d = core.defaultData();
   ['saft', 'honning', 'ved'].forEach(id => { cat(d, id).active = true; });
   itm(d, 'honning', 'flytende').qty = 4;
-  itm(d, 'ved', 'ved').qty = 2;
+  itm(d, 'ved', 'eik').qty = 2;
   // egg: begge typer 0; saft: alle fire typer 0
   const o = core.orderForCustomers(d);
   assert.deepEqual(o.inStock.map(x => x.cat.id), ['honning', 'ved']);
@@ -226,7 +256,7 @@ test('buildPublish setter nytt tidspunkt kun på det som er endret', () => {
   assert.equal(cat(out, 'syltetoy').updatedAt, now.toISOString());
   const json = JSON.parse(core.serialize(out));
   assert.deepEqual(Object.keys(json), ['version', 'updatedAt', 'categories']);
-  assert.equal(json.version, 3);
+  assert.equal(json.version, 4);
 });
 
 test('rebase legger egne endringer oppå nyere versjon fra GitHub', () => {

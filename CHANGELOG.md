@@ -1,5 +1,9 @@
 # Versjonslogg
 
+## v1.6 – 2026-10-31
+- **Ved** er delt i fire typer: Bjørk, Eik, Furu og Gran. Hver type har eget antall og egen pris per sekk.
+- Dataformat v4. Synligheten for ved beholdes. Den gamle enkeltvaren «Ved» (1 sekk, uten pris) kunne ikke knyttes til én type og er ikke tatt med.
+
 ## v1.5 – 2026-10-31
 - Kategoriene på kundesiden sorteres automatisk i tre grupper:
   1. **Med beholdning** (minst én type over 0). **Egg står alltid øverst** så lenge egg eller små egg ikke er utsolgt.

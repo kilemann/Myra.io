@@ -79,7 +79,7 @@ Hvis noen andre har publisert i mellomtiden, henter siden den nyeste versjonen o
 | Honning | Flytende honning · Sommerhonning · Lynghonning | per boks · per 500 g · per 500 g |
 | Syltetøy | Bringebær-, Jordbær-, Bjørnebær-, Blåbærsyltetøy | felles pris per glass |
 | Bær, frukt og grønnsaker | 8 typer, navn settes i admin | per hg (antall i hg) |
-| Ved | Ved | per sekk |
+| Ved | Bjørk, Eik, Furu, Gran | egen pris per sekk for hver type |
 
 - **Synlig/Skjult** gjelder hele kategorien. Skjult = «Kommer senere» på kundesiden.
 - En vare med beholdning 0 vises som **Midlertidig utsolgt**.

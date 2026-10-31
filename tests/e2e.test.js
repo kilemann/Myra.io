@@ -183,7 +183,7 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       assert.equal(put.committer.name, 'Myra lager');
       assert.match(put.message, /Egg 7 stk/);
       assert.match(put.message, /Små egg 12 stk/);
-      assert.equal(gh.data.version, 3);
+      assert.equal(gh.data.version, 4);
       const egg2 = itemOf(gh.data, 'egg', 'egg');
       assert.equal(egg2.qty, 7);
       assert.equal(egg2.prices[0].amount, 5.5);
@@ -191,7 +191,7 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       assert.equal(itemOf(gh.data, 'egg', 'smaegg').prices[0].amount, 4);
       assert.equal(catOf(gh.data, 'saft').active, true);
       assert.notEqual(egg2.updatedAt, itemOf(seed(), 'egg', 'egg').updatedAt);
-      assert.equal(itemOf(gh.data, 'ved', 'ved').updatedAt, itemOf(seed(), 'ved', 'ved').updatedAt);
+      assert.equal(itemOf(gh.data, 'ved', 'furu').updatedAt, itemOf(seed(), 'ved', 'furu').updatedAt);
       assert.equal(await page.isDisabled('#publish'), true);
     });
 
@@ -224,6 +224,16 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       await page.fill('#price-honning-lyng-0', '150');
       await page.locator('#price-honning-lyng-0').dispatchEvent('change');
 
+      const ved = page.locator('section.acard[data-category="ved"]');
+      await ved.locator('summary').click();
+      assert.deepEqual(await ved.locator('.aitem__title').allInnerTexts(), ['Bjørk', 'Eik', 'Furu', 'Gran']);
+      assert.equal(await ved.locator('#price-ved-felles-0').count(), 0, 'ingen felles pris for ved');
+      assert.match(await ved.locator('label[for="price-ved-eik-0"]').innerText(), /per sekk/);
+      await page.fill('#price-ved-eik-0', '95');
+      await page.locator('#price-ved-eik-0').dispatchEvent('change');
+      await page.fill('#price-ved-bjork-0', '80');
+      await page.locator('#price-ved-bjork-0').dispatchEvent('change');
+
       const baer = page.locator('section.acard[data-category="baer"]');
       await baer.locator('summary').click();
       assert.equal(await baer.locator('.aitem').count(), 8);
@@ -240,6 +250,8 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       assert.equal(catOf(gh.data, 'syltetoy').active, true);
       assert.equal(itemOf(gh.data, 'honning', 'lyng').prices[0].amount, 150);
       assert.equal(itemOf(gh.data, 'baer', 'bfg3').name, 'Poteter');
+      assert.equal(itemOf(gh.data, 'ved', 'eik').prices[0].amount, 95);
+      assert.equal(itemOf(gh.data, 'ved', 'bjork').prices[0].amount, 80);
       assert.match(gh.puts[gh.puts.length - 1].message, /Saft pris/);
     });
 
@@ -248,7 +260,7 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       const c = id => d.categories.find(x => x.id === id);
       ['saft', 'honning', 'syltetoy', 'ved'].forEach(id => { c(id).active = true; });
       c('honning').items[1].qty = 3;   // honning på lager
-      c('ved').items[0].qty = 2;       // ved på lager
+      c('ved').items[2].qty = 2;       // furu på lager
       // egg, saft og syltetøy: alt 0
       const shop = await ctx.newPage();
       let body = core.serialize(d);
@@ -293,7 +305,7 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
 
     await t.test('konflikt: henter nyeste versjon og beholder egne endringer', async () => {
       // noen andre publiserer i mellomtiden
-      itemOf(gh.data, 'ved', 'ved').qty = 9;
+      itemOf(gh.data, 'ved', 'gran').qty = 9;
       gh.sha = 'sha-50';
       const egg = page.locator('section.acard[data-category="egg"] .aitem[data-item="egg"]');
       await egg.getByRole('button', { name: 'Trekk fra 1 stk – Egg' }).click();
@@ -301,11 +313,11 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       await page.waitForSelector('#admin-error:not([hidden])');
       assert.match(await page.textContent('#admin-error'), /endret av noen andre/i);
       assert.equal(await page.inputValue('#qty-egg-egg'), '6');
-      assert.equal(await page.inputValue('#qty-ved-ved'), '9');
+      assert.equal(await page.inputValue('#qty-ved-gran'), '9');
       await page.click('#publish');
       await page.waitForFunction(() => /Publisert/.test(document.querySelector('#pending').textContent));
       assert.equal(itemOf(gh.data, 'egg', 'egg').qty, 6);
-      assert.equal(itemOf(gh.data, 'ved', 'ved').qty, 9);
+      assert.equal(itemOf(gh.data, 'ved', 'gran').qty, 9);
     });
 
     await t.test('Forkast tilbakestiller ulagrede endringer', async () => {
