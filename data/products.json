@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-10-31T12:05:35.293Z",
+  "updatedAt": "2026-10-31T12:14:40.506Z",
   "categories": [
     {
       "id": "egg",
@@ -69,11 +69,11 @@
         1,
         5
       ],
-      "updatedAt": "2026-10-31T12:05:35.293Z",
+      "updatedAt": "2026-10-31T12:14:40.506Z",
       "prices": [
         {
           "label": "per flaske",
-          "amount": null
+          "amount": 75
         }
       ],
       "items": [
@@ -135,10 +135,10 @@
           "prices": [
             {
               "label": "per boks",
-              "amount": null
+              "amount": 110
             }
           ],
-          "updatedAt": null
+          "updatedAt": "2026-10-31T12:14:40.506Z"
         },
         {
           "id": "sommer",
@@ -148,10 +148,10 @@
           "prices": [
             {
               "label": "per 500 g",
-              "amount": null
+              "amount": 130
             }
           ],
-          "updatedAt": null
+          "updatedAt": "2026-10-31T12:14:40.506Z"
         },
         {
           "id": "lyng",
@@ -161,10 +161,10 @@
           "prices": [
             {
               "label": "per 500 g",
-              "amount": null
+              "amount": 130
             }
           ],
-          "updatedAt": null
+          "updatedAt": "2026-10-31T12:14:40.506Z"
         }
       ]
     },
@@ -181,11 +181,11 @@
         1,
         5
       ],
-      "updatedAt": "2026-10-31T12:05:35.293Z",
+      "updatedAt": "2026-10-31T12:14:40.506Z",
       "prices": [
         {
           "label": "per glass",
-          "amount": null
+          "amount": 45
         }
       ],
       "items": [
