@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-10-31T12:14:40.506Z",
+  "updatedAt": "2026-10-31T12:35:17.388Z",
   "categories": [
     {
       "id": "egg",
@@ -193,9 +193,9 @@
           "id": "bringebaer",
           "name": "Bringebærsyltetøy",
           "unit": "glass",
-          "qty": 0,
+          "qty": 1,
           "prices": [],
-          "updatedAt": null
+          "updatedAt": "2026-10-31T12:35:17.388Z"
         },
         {
           "id": "jordbaer",
