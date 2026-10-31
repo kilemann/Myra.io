@@ -1,6 +1,6 @@
 {
   "version": 4,
-  "updatedAt": "2026-10-31T14:57:23.867Z",
+  "updatedAt": "2026-10-31T18:59:06.538Z",
   "categories": [
     {
       "id": "egg",
@@ -81,17 +81,17 @@
           "id": "baersaft",
           "name": "Bærsaft",
           "unit": "flasker",
-          "qty": 0,
+          "qty": 1,
           "prices": [],
-          "updatedAt": null
+          "updatedAt": "2026-10-31T18:59:06.538Z"
         },
         {
           "id": "solbaersaft",
           "name": "Solbærsaft",
           "unit": "flasker",
-          "qty": 0,
+          "qty": 5,
           "prices": [],
-          "updatedAt": null
+          "updatedAt": "2026-10-31T18:59:06.538Z"
         },
         {
           "id": "aroniasaft",
@@ -157,14 +157,14 @@
           "id": "lyng",
           "name": "Lynghonning",
           "unit": "stk",
-          "qty": 0,
+          "qty": 1,
           "prices": [
             {
               "label": "per 500 g",
               "amount": 130
             }
           ],
-          "updatedAt": "2026-10-31T12:14:40.506Z"
+          "updatedAt": "2026-10-31T18:59:06.538Z"
         }
       ]
     },
@@ -404,14 +404,14 @@
           "id": "gran",
           "name": "Gran",
           "unit": "sekker",
-          "qty": 0,
+          "qty": 2,
           "prices": [
             {
               "label": "per sekk",
               "amount": null
             }
           ],
-          "updatedAt": null
+          "updatedAt": "2026-10-31T18:59:06.538Z"
         }
       ]
     }
