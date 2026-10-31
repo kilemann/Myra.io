@@ -123,6 +123,41 @@ test('visibleItems skjuler varer uten navn', () => {
   assert.equal(core.visibleItems(cat(d, 'saft')).length, 4);
 });
 
+test('rekkefølge for kunder: egg øverst når det er på lager', () => {
+  const d = core.defaultData();
+  ['saft', 'honning', 'syltetoy'].forEach(id => { cat(d, id).active = true; });
+  itm(d, 'egg', 'smaegg').qty = 2;            // bare små egg igjen – egg er ikke utsolgt
+  itm(d, 'saft', 'ripssaft').qty = 3;
+  itm(d, 'honning', 'lyng').qty = 1;
+  const o = core.orderForCustomers(d);
+  assert.deepEqual(o.inStock.map(x => x.cat.id), ['egg', 'saft', 'honning']);
+  assert.deepEqual(o.soldOut.map(x => x.cat.id), ['syltetoy']);
+  assert.deepEqual(o.coming.map(c => c.id), ['baer', 'ved']);
+});
+
+test('rekkefølge for kunder: helt utsolgte kategorier havner sist, også egg', () => {
+  const d = core.defaultData();
+  ['saft', 'honning', 'ved'].forEach(id => { cat(d, id).active = true; });
+  itm(d, 'honning', 'flytende').qty = 4;
+  itm(d, 'ved', 'ved').qty = 2;
+  // egg: begge typer 0; saft: alle fire typer 0
+  const o = core.orderForCustomers(d);
+  assert.deepEqual(o.inStock.map(x => x.cat.id), ['honning', 'ved']);
+  assert.deepEqual(o.soldOut.map(x => x.cat.id), ['egg', 'saft']);
+});
+
+test('rekkefølge for kunder: én type igjen holder kategorien oppe; varer uten navn teller ikke', () => {
+  const d = core.defaultData();
+  cat(d, 'saft').active = true;
+  cat(d, 'baer').active = true;
+  itm(d, 'saft', 'aroniasaft').qty = 1;
+  itm(d, 'baer', 'bfg2').qty = 50;        // har antall, men ikke navn – vises ikke
+  itm(d, 'baer', 'bfg1').name = 'Poteter'; // har navn, men 0
+  const o = core.orderForCustomers(d);
+  assert.ok(o.inStock.some(x => x.cat.id === 'saft'));
+  assert.ok(o.soldOut.some(x => x.cat.id === 'baer'));
+});
+
 test('latestUpdate gir nyeste tidspunkt i kategorien', () => {
   const c = cat(base(), 'egg');
   c.items[1].updatedAt = '2026-10-29T08:00:00.000Z';

@@ -243,6 +243,30 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       assert.match(gh.puts[gh.puts.length - 1].message, /Saft pris/);
     });
 
+    await t.test('kundesiden: kategorier med beholdning først, egg øverst, helt utsolgte sist', async () => {
+      const d = core.defaultData();
+      const c = id => d.categories.find(x => x.id === id);
+      ['saft', 'honning', 'syltetoy', 'ved'].forEach(id => { c(id).active = true; });
+      c('honning').items[1].qty = 3;   // honning på lager
+      c('ved').items[0].qty = 2;       // ved på lager
+      // egg, saft og syltetøy: alt 0
+      const shop = await ctx.newPage();
+      let body = core.serialize(d);
+      await shop.route(/^http:\/\/localhost:\d+\/data\/products\.json/, r => r.fulfill({ status: 200, contentType: 'application/json', body }));
+      await shop.goto(base + 'index.html');
+      await shop.waitForSelector('.card[data-category="egg"]');
+      const ids = () => shop.locator('#products .card').evaluateAll(cs => cs.map(x => x.dataset.category));
+      assert.deepEqual(await ids(), ['honning', 'ved', 'egg', 'saft', 'syltetoy', 'baer']);
+
+      // Egg kommer inn igjen -> øverst
+      c('egg').items[1].qty = 6;
+      body = core.serialize(d);
+      await shop.reload();
+      await shop.waitForSelector('.card[data-category="egg"]');
+      assert.deepEqual(await ids(), ['egg', 'honning', 'ved', 'saft', 'syltetoy', 'baer']);
+      await shop.close();
+    });
+
     await t.test('kundesiden: felles pris i boksen og «Midlertidig utsolgt» på varer med 0', async () => {
       const shop = await ctx.newPage();
       await shop.route(/^http:\/\/localhost:\d+\/data\/products\.json/, r => r.fulfill({ status: 200, contentType: 'application/json', body: core.serialize(gh.data) }));

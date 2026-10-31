@@ -1,5 +1,13 @@
 # Versjonslogg
 
+## v1.5 – 2026-10-31
+- Kategoriene på kundesiden sorteres automatisk i tre grupper:
+  1. **Med beholdning** (minst én type over 0). **Egg står alltid øverst** så lenge egg eller små egg ikke er utsolgt.
+  2. **Helt utsolgt** (alle typer i kategorien er 0, f.eks. alle fire saftene).
+  3. **Kommer senere** (skjulte kategorier).
+- Innenfor hver gruppe er rekkefølgen den faste: Egg, Saft, Honning, Syltetøy, Bær/frukt/grønt, Ved.
+- Admin-siden beholder fast rekkefølge.
+
 ## v1.4.1 – 2026-10-31
 - «Midlertidig utsolgt» og andre merkelapper holder seg inne i boksen. Er det ikke plass ved siden av navnet, havner merkelappen på linja under. Teksten er litt mindre.
 - Fjernet «– samme pris for alle» etter felles pris for saft og syltetøy.

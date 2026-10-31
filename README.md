@@ -83,6 +83,7 @@ Hvis noen andre har publisert i mellomtiden, henter siden den nyeste versjonen o
 
 - **Synlig/Skjult** gjelder hele kategorien. Skjult = «Kommer senere» på kundesiden.
 - En vare med beholdning 0 vises som **Midlertidig utsolgt**.
+- Rekkefølge på kundesiden: kategorier med beholdning først (egg alltid øverst når det ikke er utsolgt), deretter helt utsolgte kategorier, og «Kommer senere» sist.
 - Bær, frukt og grønnsaker: en type uten navn vises ikke for kundene. Tøm navnet for å fjerne en type.
 
 ### Legge til en ny kategori

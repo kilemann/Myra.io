@@ -217,6 +217,28 @@
   }
 
   // Varer som skal vises for kunden (de med navn)
+  // Rekkefølge på kundesiden:
+  //   1. Kategorier med beholdning (minst én vare > 0) – egg alltid øverst når egg ikke er utsolgt
+  //   2. Kategorier som er synlige, men helt utsolgt (alle varer 0)
+  //   3. «Kommer senere» (skjult eller uten varer med navn)
+  // Innenfor hver gruppe beholdes den faste rekkefølgen (sort).
+  var TOP_CATEGORY = 'egg';
+  function orderForCustomers(data) {
+    var inStock = [], soldOut = [], coming = [];
+    data.categories.forEach(function (cat) {
+      var items = visibleItems(cat);
+      if (!cat.active || !items.length) { coming.push(cat); return; }
+      var entry = { cat: cat, items: items };
+      if (items.some(function (i) { return i.qty > 0; })) inStock.push(entry);
+      else soldOut.push(entry);
+    });
+    inStock.sort(function (a, b) {
+      var ta = a.cat.id === TOP_CATEGORY ? 0 : 1, tb = b.cat.id === TOP_CATEGORY ? 0 : 1;
+      return (ta - tb) || (a.cat.sort - b.cat.sort);
+    });
+    return { inStock: inStock, soldOut: soldOut, coming: coming };
+  }
+
   function visibleItems(cat) {
     return cat.items.filter(function (i) { return i.name.trim() !== ''; });
   }
@@ -398,6 +420,7 @@
     normalizeData: normalizeData,
     serialize: serialize,
     visibleItems: visibleItems,
+    orderForCustomers: orderForCustomers,
     latestUpdate: latestUpdate,
     stockStatus: stockStatus,
     formatUpdated: formatUpdated,

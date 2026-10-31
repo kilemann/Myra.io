@@ -1,4 +1,4 @@
-/* Myra gårdsutsalg v1.4 – kundeside (kategorier med varer) */
+/* Myra gårdsutsalg v1.5 – kundeside (kategorier med varer) */
 (function () {
   'use strict';
   var C = window.MYRA_CONFIG;
@@ -89,12 +89,9 @@
 
   function render(data) {
     var now = new Date();
-    var shown = [], coming = [];
-    data.categories.forEach(function (cat) {
-      var items = core.visibleItems(cat);
-      if (cat.active && items.length) shown.push({ cat: cat, items: items });
-      else coming.push(cat);
-    });
+    // Med beholdning først (egg øverst), helt utsolgte etter, «Kommer senere» sist
+    var order = core.orderForCustomers(data);
+    var shown = order.inStock.concat(order.soldOut), coming = order.coming;
     var nodes = shown.map(function (s) {
       var single = s.items.length === 1 && !s.cat.namedItems && s.cat.items.length === 1;
       return single ? singleCard(s.cat, s.items[0], now) : listCard(s.cat, s.items, now);
