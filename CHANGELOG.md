@@ -1,5 +1,10 @@
 # Versjonslogg
 
+## v1.4.1 – 2026-10-31
+- «Midlertidig utsolgt» og andre merkelapper holder seg inne i boksen. Er det ikke plass ved siden av navnet, havner merkelappen på linja under. Teksten er litt mindre.
+- Fjernet «– samme pris for alle» etter felles pris for saft og syltetøy.
+- Testen sjekker nå at merkelappene ikke går utenfor boksen ved 390 og 320 px bredde.
+
 ## v1.4 – 2026-10-31
 - Dataformat v3. Lageret flyttes automatisk over, og egg og ved er uendret.
 - **Saft** har faste typer: Bærsaft, Solbærsaft, Aroniasaft og Ripssaft. Hver type har eget antall, og prisen per flaske er felles.

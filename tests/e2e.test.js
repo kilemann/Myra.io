@@ -249,7 +249,18 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       await shop.goto(base + 'index.html');
       await shop.waitForSelector('.card[data-category="syltetoy"]');
       const sylt = await shop.locator('.card[data-category="syltetoy"]').innerText();
-      assert.match(sylt, /60 kr per glass – samme pris for alle/);
+      assert.match(sylt, /60 kr per glass/);
+      assert.doesNotMatch(sylt, /samme pris for alle/);
+      // Ingen merkelapp skal gå utenfor boksen, heller ikke på en smal mobil
+      for (const width of [390, 320]) {
+        await shop.setViewportSize({ width, height: 800 });
+        const overflow = await shop.evaluate(() => [...document.querySelectorAll('.card .badge')].filter(b => {
+          const card = b.closest('.card').getBoundingClientRect(), r = b.getBoundingClientRect();
+          return r.right > card.right - 8 || r.left < card.left;
+        }).map(b => b.textContent));
+        assert.deepEqual(overflow, [], 'merkelapper utenfor boksen ved ' + width + ' px');
+        assert.equal(await shop.evaluate(() => document.documentElement.scrollWidth), width);
+      }
       assert.match(sylt, /Jordbærsyltetøy[\s\S]*5[\s\S]*glass tilgjengelig/);
       assert.match(sylt, /Bringebærsyltetøy\s*Midlertidig utsolgt/);
       assert.equal(await shop.locator('.card[data-category="syltetoy"] .item--out').count(), 3);

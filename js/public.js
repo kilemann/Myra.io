@@ -54,7 +54,7 @@
   // Flere varer (egg, saft, honning, syltetøy, bær/frukt/grønt): en liste i samme boks
   function listCard(cat, items, now) {
     var shared = cat.prices.length ? el('ul', { class: 'prices prices--shared' }, cat.prices.map(function (pr) {
-      return el('li', { text: core.formatPrice(pr) + (items.length > 1 ? ' – samme pris for alle' : '') });
+      return el('li', { text: core.formatPrice(pr) });
     })) : null;
     return el('article', { class: 'card', 'data-category': cat.id }, [
       el('div', null, [

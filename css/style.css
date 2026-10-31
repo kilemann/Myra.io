@@ -248,3 +248,9 @@ button { cursor: pointer; }
 .item--out .item__prices { opacity: 0.7; }
 .pricebox--shared { border-top: 0; padding: 12px; border-radius: 16px; background: var(--green-soft); }
 .pricebox--dirty { box-shadow: inset 0 0 0 2px var(--yolk); }
+
+/* ---------- v1.4.1: merkelapper holder seg inne i boksen ---------- */
+.card__head, .item__head { flex-wrap: wrap; row-gap: 6px; }
+.card__head > div, .item__name { min-width: 0; flex: 1 1 auto; overflow-wrap: anywhere; }
+.badge { flex: none; max-width: 100%; }
+.item__head .badge { font-size: 11px; padding: 4px 9px; }

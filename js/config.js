@@ -3,7 +3,7 @@
  * fila er offentlig. GitHub-nøkkelen lagres bare kryptert på selgers telefon.
  */
 window.MYRA_CONFIG = {
-  version: '1.4',
+  version: '1.4.1',
 
   // Hvor datafila ligger på GitHub
   github: {
