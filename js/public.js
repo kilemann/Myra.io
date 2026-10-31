@@ -1,4 +1,4 @@
-/* Myra gårdsutsalg v1.3 – kundeside (kategorier med varer) */
+/* Myra gårdsutsalg v1.4 – kundeside (kategorier med varer) */
 (function () {
   'use strict';
   var C = window.MYRA_CONFIG;
@@ -51,20 +51,25 @@
     ]);
   }
 
-  // Flere varer (egg + små egg, syltetøy, bær/frukt/grønt): en liste
+  // Flere varer (egg, saft, honning, syltetøy, bær/frukt/grønt): en liste i samme boks
   function listCard(cat, items, now) {
+    var shared = cat.prices.length ? el('ul', { class: 'prices prices--shared' }, cat.prices.map(function (pr) {
+      return el('li', { text: core.formatPrice(pr) + (items.length > 1 ? ' – samme pris for alle' : '') });
+    })) : null;
     return el('article', { class: 'card', 'data-category': cat.id }, [
       el('div', null, [
         el('h3', { class: 'card__title', text: cat.name }),
         cat.note ? el('p', { class: 'card__note', text: cat.note }) : null
       ]),
+      shared,
       el('ul', { class: 'items' }, items.map(function (it) {
-        return el('li', { class: 'item' }, [
+        var out = it.qty <= 0;
+        return el('li', { class: 'item' + (out ? ' item--out' : '') }, [
           el('div', { class: 'item__head' }, [
             el('span', { class: 'item__name', text: it.name }),
             badge(it.qty)
           ]),
-          el('p', { class: 'item__qty' }, [
+          out ? null : el('p', { class: 'item__qty' }, [
             el('strong', { text: String(it.qty) }), ' ' + it.unit + ' tilgjengelig'
           ]),
           priceList(it, 'item__prices')

@@ -75,14 +75,15 @@ Hvis noen andre har publisert i mellomtiden, henter siden den nyeste versjonen o
 | Kategori | Varer | Pris |
 |---|---|---|
 | Egg | Egg, Små egg | per egg og per brett (12 stk) for begge |
-| Saft | Saft | per flaske |
-| Honning | Honning | per boks |
-| Syltetøy | 4 typer, navn settes i admin | per glass |
+| Saft | Bærsaft, Solbærsaft, Aroniasaft, Ripssaft | felles pris per flaske |
+| Honning | Flytende honning · Sommerhonning · Lynghonning | per boks · per 500 g · per 500 g |
+| Syltetøy | Bringebær-, Jordbær-, Bjørnebær-, Blåbærsyltetøy | felles pris per glass |
 | Bær, frukt og grønnsaker | 8 typer, navn settes i admin | per hg (antall i hg) |
 | Ved | Ved | per sekk |
 
 - **Synlig/Skjult** gjelder hele kategorien. Skjult = «Kommer senere» på kundesiden.
-- En vare uten navn vises ikke for kundene. Tøm navnet for å fjerne en type.
+- En vare med beholdning 0 vises som **Midlertidig utsolgt**.
+- Bær, frukt og grønnsaker: en type uten navn vises ikke for kundene. Tøm navnet for å fjerne en type.
 
 ### Legge til en ny kategori
 

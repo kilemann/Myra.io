@@ -1,5 +1,13 @@
 # Versjonslogg
 
+## v1.4 – 2026-10-31
+- Dataformat v3. Lageret flyttes automatisk over, og egg og ved er uendret.
+- **Saft** har faste typer: Bærsaft, Solbærsaft, Aroniasaft og Ripssaft. Hver type har eget antall, og prisen per flaske er felles.
+- **Syltetøy** har faste typer: Bringebær-, Jordbær-, Bjørnebær- og Blåbærsyltetøy. Hver type har eget antall, og prisen per glass er felles.
+- **Honning** er delt i tre: Flytende honning (per boks), Sommerhonning og Lynghonning (per 500 g), hver med egen pris.
+- Varer med beholdning 0 vises som **Midlertidig utsolgt** på kundesiden.
+- Kundesiden viser felles pris øverst i kategoriboksen. Admin har et eget felt for felles pris.
+
 ## v1.3.1 – 2026-10-30
 - Små egg har fått pris **per brett (12 stk)** i tillegg til pris per egg.
 - Nye prisfelt i standardoppsettet legges automatisk til i eksisterende lagerdata, uten å endre priser som allerede er satt.

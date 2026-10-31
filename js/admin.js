@@ -1,4 +1,4 @@
-/* Myra gårdsutsalg v1.3 – oppdateringsside for selger (lagrer via GitHub) */
+/* Myra gårdsutsalg v1.4 – oppdateringsside for selger (lagrer via GitHub) */
 (function () {
   'use strict';
   var C = window.MYRA_CONFIG;
@@ -267,6 +267,12 @@
     var last = core.latestUpdate(cat);
     v.meta.textContent = catChanged ? 'Endret – ikke publisert' : (last ? core.formatUpdated(last) : '');
     v.meta.className = 'acard__meta' + (catChanged ? ' acard__meta--saving' : '');
+    v.prices.forEach(function (input, i) {
+      if (document.activeElement !== input && cat.prices[i]) {
+        input.value = cat.prices[i].amount === null ? '' : String(cat.prices[i].amount).replace('.', ',');
+      }
+    });
+    if (v.sharedBox) v.sharedBox.classList.toggle('pricebox--dirty', core.changedKeys(base, local).indexOf('catprice:' + catId) !== -1);
 
     cat.items.forEach(function (it, n) {
       var r = v.items[it.id];
@@ -369,6 +375,37 @@
       v.items[it.id] = refs;
       return buildItem(cat, it, n, refs);
     });
+
+    // Felles pris for alle varene i kategorien (saft, syltetøy)
+    v.prices = [];
+    v.sharedBox = null;
+    if (cat.prices.length) {
+      var rows = cat.prices.map(function (pr, i) {
+        var inputId = 'price-' + cat.id + '-felles-' + i;
+        var input = el('input', {
+          id: inputId, class: 'input', type: 'text', inputmode: 'decimal', autocomplete: 'off', placeholder: '0',
+          onchange: function () {
+            var val = core.parseAmount(input.value);
+            if (val === undefined) {
+              v.meta.textContent = 'Ugyldig pris – bruk bare tall';
+              v.meta.className = 'acard__meta acard__meta--error';
+              input.value = '';
+              return;
+            }
+            change(cat.id, function () { category(cat.id).prices[i].amount = val; });
+          },
+          onfocus: function () { input.select(); }
+        });
+        v.prices.push(input);
+        return el('div', { class: 'price-row' }, [
+          el('label', { for: inputId, text: 'Pris ' + pr.label }),
+          el('span', { class: 'price-row__right' }, [input, el('span', { class: 'kr', text: 'kr' })])
+        ]);
+      });
+      v.sharedBox = el('div', { class: 'pricebox pricebox--shared' }, [
+        el('span', { class: 'pricebox__label', text: 'Felles pris for alle' })
+      ].concat(rows));
+    }
     var body;
     if (cat.items.length > 2) {
       // Mange varer: samlet i en sammenleggbar seksjon, åpen når kategorien er synlig
@@ -385,6 +422,7 @@
         el('div', null, [el('h2', { class: 'acard__title', id: 'h-' + cat.id, text: cat.name }), v.meta]),
         v.toggle
       ]),
+      v.sharedBox,
       body
     ]);
     views[cat.id] = v;

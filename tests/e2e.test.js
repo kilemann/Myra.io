@@ -183,7 +183,7 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       assert.equal(put.committer.name, 'Myra lager');
       assert.match(put.message, /Egg 7 stk/);
       assert.match(put.message, /Små egg 12 stk/);
-      assert.equal(gh.data.version, 2);
+      assert.equal(gh.data.version, 3);
       const egg2 = itemOf(gh.data, 'egg', 'egg');
       assert.equal(egg2.qty, 7);
       assert.equal(egg2.prices[0].amount, 5.5);
@@ -195,38 +195,65 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       assert.equal(await page.isDisabled('#publish'), true);
     });
 
-    await t.test('syltetøy og bær: selger setter navn og pris, og slår på kategorien', async () => {
+    await t.test('saft og syltetøy: faste navn, felles pris og eget antall per type', async () => {
+      const saft = page.locator('section.acard[data-category="saft"]');
+      assert.equal(await saft.locator('.aitem').count(), 4);
+      assert.deepEqual(await saft.locator('.aitem__title').allInnerTexts(), ['Bærsaft', 'Solbærsaft', 'Aroniasaft', 'Ripssaft']);
+      assert.equal(await saft.locator('input[id^="name-"]').count(), 0, 'faste navn – ingen navnefelt');
+      assert.equal(await saft.locator('.aitem .pricebox').count(), 0, 'ingen egen pris per type');
+      await page.fill('#price-saft-felles-0', '45');
+      await page.locator('#price-saft-felles-0').dispatchEvent('change');
+      await page.fill('#qty-saft-ripssaft', '4');
+      await page.locator('#qty-saft-ripssaft').dispatchEvent('change');
+
       const sylt = page.locator('section.acard[data-category="syltetoy"]');
       await sylt.locator('summary').click();
-      await page.fill('#name-syltetoy-sylt1', 'Jordbærsyltetøy');
-      await page.locator('#name-syltetoy-sylt1').dispatchEvent('change');
-      await page.fill('#qty-syltetoy-sylt1', '5');
-      await page.locator('#qty-syltetoy-sylt1').dispatchEvent('change');
-      await page.fill('#price-syltetoy-sylt1-0', '60');
-      await page.locator('#price-syltetoy-sylt1-0').dispatchEvent('change');
+      assert.deepEqual(await sylt.locator('.aitem__title').allInnerTexts(),
+        ['Bringebærsyltetøy', 'Jordbærsyltetøy', 'Bjørnebærsyltetøy', 'Blåbærsyltetøy']);
+      assert.match(await sylt.locator('label[for="price-syltetoy-felles-0"]').innerText(), /per glass/);
+      await page.fill('#price-syltetoy-felles-0', '60');
+      await page.locator('#price-syltetoy-felles-0').dispatchEvent('change');
+      await page.fill('#qty-syltetoy-jordbaer', '5');
+      await page.locator('#qty-syltetoy-jordbaer').dispatchEvent('change');
       await sylt.locator('.toggle').click();
-      assert.equal(await sylt.locator('.aitem[data-item="sylt1"] .aitem__title').innerText(), 'Jordbærsyltetøy');
+
+      const hon = page.locator('section.acard[data-category="honning"]');
+      await hon.locator('summary').click();
+      assert.match(await hon.locator('label[for="price-honning-sommer-0"]').innerText(), /per 500 g/);
+      assert.match(await hon.locator('label[for="price-honning-flytende-0"]').innerText(), /per boks/);
+      await page.fill('#price-honning-lyng-0', '150');
+      await page.locator('#price-honning-lyng-0').dispatchEvent('change');
 
       const baer = page.locator('section.acard[data-category="baer"]');
       await baer.locator('summary').click();
       assert.equal(await baer.locator('.aitem').count(), 8);
-      assert.equal(await page.inputValue('#name-baer-bfg3'), '');
       await page.fill('#name-baer-bfg3', 'Poteter');
       await page.locator('#name-baer-bfg3').dispatchEvent('change');
-      await page.fill('#price-baer-bfg3-0', '3,5');
-      await page.locator('#price-baer-bfg3-0').dispatchEvent('change');
-      assert.match(await baer.locator('label[for="price-baer-bfg3-0"]').innerText(), /per hg/);
 
       await page.click('#publish');
       await page.waitForFunction(() => /Publisert/.test(document.querySelector('#pending').textContent));
-      const s1 = itemOf(gh.data, 'syltetoy', 'sylt1');
-      assert.equal(s1.name, 'Jordbærsyltetøy');
-      assert.equal(s1.qty, 5);
-      assert.equal(s1.prices[0].amount, 60);
+      assert.equal(catOf(gh.data, 'saft').prices[0].amount, 45);
+      assert.equal(itemOf(gh.data, 'saft', 'ripssaft').qty, 4);
+      assert.equal(itemOf(gh.data, 'saft', 'baersaft').qty, 0);
+      assert.equal(catOf(gh.data, 'syltetoy').prices[0].amount, 60);
+      assert.equal(itemOf(gh.data, 'syltetoy', 'jordbaer').qty, 5);
       assert.equal(catOf(gh.data, 'syltetoy').active, true);
+      assert.equal(itemOf(gh.data, 'honning', 'lyng').prices[0].amount, 150);
       assert.equal(itemOf(gh.data, 'baer', 'bfg3').name, 'Poteter');
-      assert.equal(itemOf(gh.data, 'baer', 'bfg3').prices[0].amount, 3.5);
-      assert.equal(catOf(gh.data, 'baer').active, false);
+      assert.match(gh.puts[gh.puts.length - 1].message, /Saft pris/);
+    });
+
+    await t.test('kundesiden: felles pris i boksen og «Midlertidig utsolgt» på varer med 0', async () => {
+      const shop = await ctx.newPage();
+      await shop.route(/^http:\/\/localhost:\d+\/data\/products\.json/, r => r.fulfill({ status: 200, contentType: 'application/json', body: core.serialize(gh.data) }));
+      await shop.goto(base + 'index.html');
+      await shop.waitForSelector('.card[data-category="syltetoy"]');
+      const sylt = await shop.locator('.card[data-category="syltetoy"]').innerText();
+      assert.match(sylt, /60 kr per glass – samme pris for alle/);
+      assert.match(sylt, /Jordbærsyltetøy[\s\S]*5[\s\S]*glass tilgjengelig/);
+      assert.match(sylt, /Bringebærsyltetøy\s*Midlertidig utsolgt/);
+      assert.equal(await shop.locator('.card[data-category="syltetoy"] .item--out').count(), 3);
+      await shop.close();
     });
 
     await t.test('konflikt: henter nyeste versjon og beholder egne endringer', async () => {
