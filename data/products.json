@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-10-30T19:42:28.805Z",
+  "updatedAt": "2026-10-31T12:05:35.293Z",
   "categories": [
     {
       "id": "egg",
@@ -61,7 +61,7 @@
       "sort": 20,
       "name": "Saft",
       "note": "Hjemmelaget",
-      "active": false,
+      "active": true,
       "namedItems": false,
       "steps": [
         -5,
@@ -69,7 +69,7 @@
         1,
         5
       ],
-      "updatedAt": "2026-10-27T15:00:00.000Z",
+      "updatedAt": "2026-10-31T12:05:35.293Z",
       "prices": [
         {
           "label": "per flaske",
@@ -116,7 +116,7 @@
       "sort": 30,
       "name": "Honning",
       "note": "",
-      "active": false,
+      "active": true,
       "namedItems": false,
       "steps": [
         -5,
@@ -124,7 +124,7 @@
         1,
         5
       ],
-      "updatedAt": null,
+      "updatedAt": "2026-10-31T12:05:35.293Z",
       "prices": [],
       "items": [
         {
@@ -173,7 +173,7 @@
       "sort": 40,
       "name": "Syltetøy",
       "note": "Hjemmelaget",
-      "active": false,
+      "active": true,
       "namedItems": false,
       "steps": [
         -5,
@@ -181,7 +181,7 @@
         1,
         5
       ],
-      "updatedAt": null,
+      "updatedAt": "2026-10-31T12:05:35.293Z",
       "prices": [
         {
           "label": "per glass",
