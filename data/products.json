@@ -1,6 +1,6 @@
 {
   "version": 4,
-  "updatedAt": "2026-10-31T14:52:07.841Z",
+  "updatedAt": "2026-10-31T14:57:23.867Z",
   "categories": [
     {
       "id": "egg",
@@ -41,7 +41,7 @@
           "id": "smaegg",
           "name": "Små egg",
           "unit": "stk",
-          "qty": 6,
+          "qty": 7,
           "prices": [
             {
               "label": "per egg",
@@ -52,7 +52,7 @@
               "amount": 60
             }
           ],
-          "updatedAt": "2026-10-30T19:42:28.805Z"
+          "updatedAt": "2026-10-31T14:57:23.867Z"
         }
       ]
     },
@@ -131,14 +131,14 @@
           "id": "flytende",
           "name": "Flytende honning",
           "unit": "bokser",
-          "qty": 0,
+          "qty": 1,
           "prices": [
             {
               "label": "per boks",
               "amount": 110
             }
           ],
-          "updatedAt": "2026-10-31T12:14:40.506Z"
+          "updatedAt": "2026-10-31T14:57:23.867Z"
         },
         {
           "id": "sommer",
