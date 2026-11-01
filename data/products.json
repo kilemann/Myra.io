@@ -1,6 +1,6 @@
 {
   "version": 4,
-  "updatedAt": "2026-10-31T18:59:06.538Z",
+  "updatedAt": "2026-11-01T08:47:21.917Z",
   "categories": [
     {
       "id": "egg",
@@ -81,17 +81,17 @@
           "id": "baersaft",
           "name": "Bærsaft",
           "unit": "flasker",
-          "qty": 1,
+          "qty": 0,
           "prices": [],
-          "updatedAt": "2026-10-31T18:59:06.538Z"
+          "updatedAt": "2026-11-01T08:47:21.917Z"
         },
         {
           "id": "solbaersaft",
           "name": "Solbærsaft",
           "unit": "flasker",
-          "qty": 5,
+          "qty": 0,
           "prices": [],
-          "updatedAt": "2026-10-31T18:59:06.538Z"
+          "updatedAt": "2026-11-01T08:47:21.917Z"
         },
         {
           "id": "aroniasaft",
