@@ -120,8 +120,11 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
     await t.test('hver kategori har et lite bilde som laster', async () => {
       const icons = await page.locator('#products .card').evaluateAll(cards => cards.map(c => {
         const img = c.querySelector('img.card__icon');
+        const title = c.querySelector('.card__title').getBoundingClientRect();
+        const r = img && img.getBoundingClientRect(), card = c.getBoundingClientRect();
         return { id: c.dataset.category, src: img && img.getAttribute('src'), ok: !!img && img.complete && img.naturalWidth > 0,
-                 w: img && img.getBoundingClientRect().width, alt: img && img.getAttribute('alt') };
+                 w: r && r.width, alt: img && img.getAttribute('alt'),
+                 right: !!r && r.left >= title.right && card.right - r.right < 40 };
       }));
       assert.equal(icons.length, 6);
       for (const i of icons) {
@@ -129,6 +132,7 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
         assert.ok(i.ok, 'bildet laster for ' + i.id);
         assert.ok(i.w >= 40 && i.w <= 64, 'lite bilde for ' + i.id + ': ' + i.w);
         assert.equal(i.alt, '', 'pynt – skjermlesere hopper over');
+        assert.ok(i.right, 'bildet står til høyre i boksen for ' + i.id);
       }
     });
 

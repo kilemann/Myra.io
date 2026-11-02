@@ -39,15 +39,15 @@
     return el('img', { class: 'card__icon', src: 'img/cat/' + cat.id + '.svg', alt: '', width: '52', height: '52', loading: 'lazy' });
   }
 
-  // Bilde + tittel + undertekst
+  // Tittel + undertekst til venstre, bilde til høyre
   function titleBlock(cat, kicker) {
     return el('div', { class: 'card__brand' }, [
-      icon(cat),
       el('div', { class: 'card__titles' }, [
         kicker ? el('p', { class: 'coming-label', text: kicker }) : null,
         el('h3', { class: 'card__title', text: cat.name }),
         cat.note ? el('p', { class: 'card__note', text: cat.note }) : null
-      ])
+      ]),
+      icon(cat)
     ]);
   }
 

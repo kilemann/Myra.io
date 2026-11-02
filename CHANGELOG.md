@@ -1,5 +1,8 @@
 # Versjonslogg
 
+## v1.7.1 – 2026-11-02
+- Kategoribildet er flyttet til høyre side av boksen, på linje med tittelen.
+
 ## v1.7 – 2026-11-02
 - Et lite bilde i hver kategoriboks på kundesiden, i samme stil som logoen. Bildene ligger i `img/cat/`: egg, saft, honning, syltetøy, bær/frukt/grønt og ved.
 - Kategorier som står som «Kommer senere», har et nedtonet bilde.

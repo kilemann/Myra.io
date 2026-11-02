@@ -264,3 +264,8 @@ button { cursor: pointer; }
 @media (min-width: 720px) {
   .card__icon { width: 60px; height: 60px; }
 }
+
+/* ---------- v1.7.1: bildet til høyre i boksen ---------- */
+.card__brand { justify-content: space-between; width: 100%; }
+.card__titles { flex: 1 1 auto; }
+.card__head > .card__brand { width: auto; }
