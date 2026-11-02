@@ -117,6 +117,21 @@ test('kunde- og admin-flyt', { skip: !playwright && 'Playwright er ikke installe
       assert.equal(res.status(), 200);
     });
 
+    await t.test('hver kategori har et lite bilde som laster', async () => {
+      const icons = await page.locator('#products .card').evaluateAll(cards => cards.map(c => {
+        const img = c.querySelector('img.card__icon');
+        return { id: c.dataset.category, src: img && img.getAttribute('src'), ok: !!img && img.complete && img.naturalWidth > 0,
+                 w: img && img.getBoundingClientRect().width, alt: img && img.getAttribute('alt') };
+      }));
+      assert.equal(icons.length, 6);
+      for (const i of icons) {
+        assert.equal(i.src, 'img/cat/' + i.id + '.svg', 'riktig bilde for ' + i.id);
+        assert.ok(i.ok, 'bildet laster for ' + i.id);
+        assert.ok(i.w >= 40 && i.w <= 64, 'lite bilde for ' + i.id + ': ' + i.w);
+        assert.equal(i.alt, '', 'pynt – skjermlesere hopper over');
+      }
+    });
+
     await t.test('kundesiden har ingen lenke til admin-siden', async () => {
       assert.equal(await page.locator('a[href*="admin"]').count(), 0);
       assert.doesNotMatch(await page.locator('body').innerText(), /Oppdater lager/i);

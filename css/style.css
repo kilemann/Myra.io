@@ -254,3 +254,13 @@ button { cursor: pointer; }
 .card__head > div, .item__name { min-width: 0; flex: 1 1 auto; overflow-wrap: anywhere; }
 .badge { flex: none; max-width: 100%; }
 .item__head .badge { font-size: 11px; padding: 4px 9px; }
+
+/* ---------- v1.7: bilde per kategori ---------- */
+.card__brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.card__icon { flex: none; width: 52px; height: 52px; display: block; }
+.card__titles { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.card__titles .card__note { margin: 0; }
+.card--coming .card__icon { width: 44px; height: 44px; opacity: 0.55; filter: grayscale(0.6); }
+@media (min-width: 720px) {
+  .card__icon { width: 60px; height: 60px; }
+}

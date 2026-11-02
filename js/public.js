@@ -1,4 +1,4 @@
-/* Myra gårdsutsalg v1.5 – kundeside (kategorier med varer) */
+/* Myra gårdsutsalg v1.7 – kundeside (kategorier med varer) */
 (function () {
   'use strict';
   var C = window.MYRA_CONFIG;
@@ -32,14 +32,30 @@
     return d ? el('p', { class: 'updated', text: core.formatUpdated(d, now) }) : null;
   }
 
-  // Én vare (honning, saft, ved): stort tall som før
+  // Lite bilde per kategori (img/cat/<id>.svg). Nye kategorier uten bilde får bare tittel.
+  var ICONS = ['egg', 'saft', 'honning', 'syltetoy', 'baer', 'ved'];
+  function icon(cat) {
+    if (ICONS.indexOf(cat.id) === -1) return null;
+    return el('img', { class: 'card__icon', src: 'img/cat/' + cat.id + '.svg', alt: '', width: '52', height: '52', loading: 'lazy' });
+  }
+
+  // Bilde + tittel + undertekst
+  function titleBlock(cat, kicker) {
+    return el('div', { class: 'card__brand' }, [
+      icon(cat),
+      el('div', { class: 'card__titles' }, [
+        kicker ? el('p', { class: 'coming-label', text: kicker }) : null,
+        el('h3', { class: 'card__title', text: cat.name }),
+        cat.note ? el('p', { class: 'card__note', text: cat.note }) : null
+      ])
+    ]);
+  }
+
+  // Én vare: stort tall
   function singleCard(cat, it, now) {
     return el('article', { class: 'card', 'data-category': cat.id }, [
       el('div', { class: 'card__head' }, [
-        el('div', null, [
-          el('h3', { class: 'card__title', text: cat.name }),
-          cat.note ? el('p', { class: 'card__note', text: cat.note }) : null
-        ]),
+        titleBlock(cat),
         badge(it.qty)
       ]),
       el('p', { class: 'qty', style: 'margin:0' }, [
@@ -57,10 +73,7 @@
       return el('li', { text: core.formatPrice(pr) });
     })) : null;
     return el('article', { class: 'card', 'data-category': cat.id }, [
-      el('div', null, [
-        el('h3', { class: 'card__title', text: cat.name }),
-        cat.note ? el('p', { class: 'card__note', text: cat.note }) : null
-      ]),
+      titleBlock(cat),
       shared,
       el('ul', { class: 'items' }, items.map(function (it) {
         var out = it.qty <= 0;
@@ -81,9 +94,7 @@
 
   function comingCard(cat) {
     return el('article', { class: 'card card--coming', 'data-category': cat.id }, [
-      el('p', { class: 'coming-label', text: 'Kommer senere' }),
-      el('h3', { class: 'card__title', text: cat.name }),
-      cat.note ? el('p', { class: 'card__note', text: cat.note }) : null
+      titleBlock(cat, 'Kommer senere')
     ]);
   }
 

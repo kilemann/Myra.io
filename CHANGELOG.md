@@ -1,5 +1,10 @@
 # Versjonslogg
 
+## v1.7 – 2026-11-02
+- Et lite bilde i hver kategoriboks på kundesiden, i samme stil som logoen. Bildene ligger i `img/cat/`: egg, saft, honning, syltetøy, bær/frukt/grønt og ved.
+- Kategorier som står som «Kommer senere», har et nedtonet bilde.
+- Bildene er pynt, så skjermlesere hopper over dem (`alt=""`).
+
 ## v1.6.1 – 2026-10-31
 - Enheten står i entall når antallet er 1: «1 flaske», «1 boks», «1 sekk» (og fortsatt «2 flasker» osv.). Gjelder kundesiden, tallet i admin og commit-meldingene.
 
